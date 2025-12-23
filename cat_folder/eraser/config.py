@@ -14,7 +14,7 @@ cat_config = {
     "attack_duration": 100,
     "recovery_duration": 200,
     "attack_interval": 3000,
-    "idle_frames": ["cat_folder/eraser/walking/processed_frame_0001.png"] * 900,
+    "idle_frames": ["cat_folder/eraser/walking/processed_frame_0001.png"],#900
     "move_frames": [f"cat_folder/eraser/walking/processed_frame_0001.png"],
     "windup_frames": [f"cat_folder/eraser/attacking/processed_frame_000{i}.png" for i in range(7, 10)] \
         +[f"cat_folder/eraser/attacking/processed_frame_00{i}.png" for i in range(10, 17)],
