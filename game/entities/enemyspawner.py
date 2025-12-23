@@ -5,11 +5,12 @@ class EnemySpawner:
 
     def update(self, current_level, enemies, enemy_types, enemy_y_manager, context):
         for et in self.strategy.choose_enemy_type(current_level.enemy_types, context):
-            
-            if not self.strategy.should_spawn(et, current_level,context):
+            T = self.strategy.should_spawn(et, current_level,context)
+            if not T:
                 continue
-
-            self.spawn_enemy(et, current_level, enemies, enemy_types, enemy_y_manager, context)
+            #print(f"Spawning {T} of enemy type: {et['type']}")
+            for _ in range(T):
+                self.spawn_enemy(et, current_level, enemies, enemy_types, enemy_y_manager, context)
 
     def spawn_enemy(self, et, current_level, enemies, enemy_types, enemy_y_manager, context):
         enemy_y, slot = enemy_y_manager.get_available_y()
@@ -24,4 +25,5 @@ class EnemySpawner:
 
         key = (et["type"], et.get("variant", "default"))
         current_level.spawned_counts[key] += 1
+        #print(f"Spawned enemy: {et['type']} (Total spawned: {current_level.spawned_counts[key]})")
         current_level.last_spawn_times[key] = context["time"]
