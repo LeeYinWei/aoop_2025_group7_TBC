@@ -62,5 +62,6 @@ level_config = {
     "initial_budget": 1000, # <--- ADD THIS LINE with a starting budget for this level
     "music_path": "audio/TBC/178.ogg", # <--- ADD THIS LINE with the path to the level's background music
     "switch_music_on_boss": False, # <--- ADD THIS LINE (set to True if you want music to change when a boss appears)
-    "boss_music_path": "audio/TBC/118.ogg" # <--- ADD THIS LINE (path to boss music, only relevant if switch_music_on_boss is True)
+    "boss_music_path": "audio/TBC/118.ogg", # <--- ADD THIS LINE (path to boss music, only relevant if switch_music_on_boss is True)
+    "spawn_strategy": "advanced" # <--- ADD THIS LINE to specify the spawn strategy class, (original, advanced, ml)
 }

@@ -5,16 +5,8 @@ class EnemySpawner:
 
     def update(self, current_level, enemies, enemy_types, enemy_y_manager, context):
         for et in self.strategy.choose_enemy_type(current_level.enemy_types, context):
-            key = (et["type"], et.get("variant", "default"))
-
-            interval = et.get("spawn_interval_1", current_level.spawn_interval)
-            initial_delay = et.get("initial_delay", 0)
-
-            if context["time"] - current_level.last_spawn_times.get(key, 0) < interval:
-                continue
-            if context["time"] - context["level_start_time"] < initial_delay:
-                continue
-            if not self.strategy.should_spawn(et, context):
+            
+            if not self.strategy.should_spawn(et, current_level,context):
                 continue
 
             self.spawn_enemy(et, current_level, enemies, enemy_types, enemy_y_manager, context)
