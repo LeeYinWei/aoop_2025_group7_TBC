@@ -37,7 +37,8 @@ if os.path.exists(level_folder):
                     config["initial_budget"],
                     config.get("music_path", "audio/default_battle_music.ogg"), # Use .get() with default for optional keys
                     config.get("switch_music_on_boss", False),
-                    config.get("boss_music_path", "audio/boss_music.ogg")
+                    config.get("boss_music_path", "audio/boss_music.ogg"),
+                    config.get("spawn_strategy", "original")
                 ))
                 print(f"Loaded level: {config['name']} at index {level_index}")
             except KeyError as e:

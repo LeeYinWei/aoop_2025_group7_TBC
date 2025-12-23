@@ -12,7 +12,8 @@ class Level:
                  initial_budget, # <--- Added: Initial budget for the level
                  music_path="audio/default_battle_music.ogg", # <--- Added: Default level music path
                  switch_music_on_boss=False, # <--- Added: Flag to switch music for boss
-                 boss_music_path="audio/boss_music.ogg"): # <--- Added: Boss music path
+                 boss_music_path="audio/boss_music.ogg",
+                 spawn_strategy="original"): # <--- Added: Boss music path
         self.name = name
         self.enemy_configs = {et["type"]: load_config("enemy_folder", et["type"]) for et in enemy_types}
         valid_attributes = {"紅", "黑", "天", "鐵", "異", "惡", "死", "古", "無"}
@@ -47,6 +48,7 @@ class Level:
         self.music_path = music_path
         self.switch_music_on_boss = switch_music_on_boss
         self.boss_music_path = boss_music_path
+        self.spawn_strategy = spawn_strategy
 
         self.reset_towers() # Call reset_towers after all configs are set
 

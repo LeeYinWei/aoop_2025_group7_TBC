@@ -5,6 +5,9 @@ from .cat import Cat
 from .enemy import Enemy
 from .level import Level
 from .ymanager import YManager
+from .enemyspawner import EnemySpawner
+from .spawnstrategies import OriginalSpawnStrategy, AdvancedSpawnStrategy, MLSpawnStrategy
+from game.constants import csmoke_images1, csmoke_images2
 
 # 匯入輔助 class
 from .gaseffect import GasEffect

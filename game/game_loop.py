@@ -72,7 +72,7 @@ async def main_game_loop(screen, clock):
     game_state = "intro"
     from .battle_logic import update_battle
     from .ui import draw_level_selection, draw_game_ui, draw_pause_menu, draw_end_screen, draw_intro_screen, draw_ending_animation
-    from .entities import cat_types, cat_costs, cat_cooldowns, levels, enemy_types, YManager, CSmokeEffect, load_cat_images
+    from .entities import cat_types, cat_costs, cat_cooldowns, levels, enemy_types, YManager, CSmokeEffect, load_cat_images, OriginalSpawnStrategy, AdvancedSpawnStrategy, MLSpawnStrategy,  EnemySpawner
     from game.constants import csmoke_images1, csmoke_images2
 
     selected_level = 0
@@ -249,6 +249,16 @@ async def main_game_loop(screen, clock):
                                             enemy_tower.x + enemy_tower.width // 5, enemy_tower.y + enemy_tower.height // 2 + 60,
                                             csmoke_images1, csmoke_images2, 1000)
                                 ])
+                                mode = current_level.spawn_strategy
+                                if mode == "original":
+                                    strategy = OriginalSpawnStrategy()
+                                elif mode == "advanced":
+                                    strategy = AdvancedSpawnStrategy()
+                                elif mode == "ml":
+                                    strategy = MLSpawnStrategy() # MLSpawnStrategy(trained_model)
+
+                                enemy_spawner = EnemySpawner(strategy)
+
                                 current_level.reset_spawn_counts()
                                 cats.clear()
                                 souls.clear()
@@ -310,6 +320,16 @@ async def main_game_loop(screen, clock):
                                             enemy_tower.x + enemy_tower.width // 5, enemy_tower.y + enemy_tower.height // 2 + 60,
                                             csmoke_images1, csmoke_images2, 1000)
                                 ])
+                                mode = current_level.spawn_strategy
+                                if mode == "original":
+                                    strategy = OriginalSpawnStrategy()
+                                elif mode == "advanced":
+                                    strategy = AdvancedSpawnStrategy()
+                                elif mode == "ml":
+                                    strategy = MLSpawnStrategy() # MLSpawnStrategy(trained_model)
+
+                                enemy_spawner = EnemySpawner(strategy)
+
                                 current_level.reset_spawn_counts()
                                 cats.clear()
                                 souls.clear()
@@ -466,44 +486,24 @@ async def main_game_loop(screen, clock):
             # --- 敵人生成邏輯 ---
             # 計算敵人塔的生命值百分比。
             tower_hp_percent = (enemy_tower.hp / enemy_tower.max_hp) * 100 if enemy_tower else 0
-            # 遍歷當前關卡中定義的所有敵人類型。
-            for et in current_level.enemy_types:
-                key = (et["type"], et.get("variant", "default")) # 建立敵人類型和變體的唯一鍵。
-                # 判斷敵人是否可以生成：
-                # 1. 如果不是「有限制」的敵人，或者
-                # 2. 是「有限制」的敵人，但已生成的數量尚未達到上限，
-                # 並且敵人塔的生命值百分比符合該敵人類型的生成條件。
-                if (not et.get("is_limited", False) or current_level.spawned_counts.get(key, 0) < et.get("spawn_count", 0)) and tower_hp_percent <= et.get("tower_hp_percent", 100):
-                    # 獲取該敵人的生成間隔，如果未指定則使用關卡預設間隔。
-                    interval = et.get("spawn_interval_1", current_level.spawn_interval)
-                    # 獲取該敵人的初始延遲生成時間。
-                    initial_delay = et.get("initial_delay", 0)
-                    # 如果自上次該類型敵人生成以來已經足夠的時間，且遊戲開始已達到初始延遲。
-                    if current_time - current_level.last_spawn_times.get(key, 0) >= interval and current_time - level_start_time >= initial_delay:
-                        # 計算敵人塔的中心X軸位置。
-                        enemy_tower_center = current_level.enemy_tower.x + current_level.enemy_tower.width / 2
-                        # 建立敵人基本配置字典，並用關卡特定的敵人配置進行更新。
-                        config = {
-                            "hp": 100, "speed": 1, "atk": 10, "attack_range": 50,
-                            "width": 50, "height": 50, "hp_multiplier": et.get("hp_multiplier", 1.0),
-                            "atk_multiplier": et.get("damage_multiplier", 1.0), "kb_limit": 1,
-                            "attack_interval": 1000, "windup_duration": 200, "attack_duration": 100,
-                            "recovery_duration": 50, "is_aoe": et.get("is_aoe", False),
-                            "color": (255, 0, 0), "idle_frames": [], "move_frames": [],
-                            "windup_frames": [], "attack_frames": [], "recovery_frames": [], "kb_frames": []
-                        }
-                        config.update(current_level.enemy_configs.get(et["type"], {}))
-                        # 從敵人Y軸管理器獲取一個可用的Y軸槽位。
-                        enemy_y, enemy_slot = enemy_y_manager.get_available_y()
-                        # 創建一個新的敵人實例，傳遞配置和Boss狀態。
-                        enemy = enemy_types[et["type"]](enemy_tower_center, enemy_y, is_boss=et.get("is_boss", False), cfg=config)
-                        enemy.slot_index = enemy_slot # 分配槽位索引。
-                        # 微調初始X軸位置，使其在塔中心右側。
-                        start_x = enemy_tower_center - enemy.width / 2 + 50
-                        enemy.x = start_x
-                        enemies.append(enemy) # 將新敵人添加到活動敵人列表中。
-                        current_level.spawned_counts[key] += 1 # 增加該類型敵人的生成計數。
-                        current_level.last_spawn_times[key] = current_time # 更新該類型敵人的上次生成時間。
+            
+            # === 建立 context（給 AI 用）===
+            context = {
+                "tower_hp_percent": tower_hp_percent,
+                "time": current_time,
+                "level_start_time": level_start_time,
+                "spawned_counts": current_level.spawned_counts,
+                "last_spawn_times": current_level.last_spawn_times,
+            }
+
+            # === 交給 EnemySpawner ===
+            enemy_spawner.update(
+                current_level=current_level,
+                enemies=enemies,
+                enemy_types=enemy_types,
+                enemy_y_manager=enemy_y_manager,
+                context=context
+            )
 
             # --- 關卡完成檢查 ---
             # 檢查所有有限制數量的敵人都已經生成 (這不代表他們已被擊敗)。

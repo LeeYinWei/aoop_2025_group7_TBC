@@ -256,3 +256,14 @@ class Common(ABC):
                 self.speed /= 0.5
             elif effect == "Weaken":
                 self.atk /= 0.7
+
+class EnemySpawnStrategy(ABC):
+    @abstractmethod
+    def should_spawn(self, et, context) -> bool:
+        """判斷是否要生成這類敵人"""
+        pass
+
+    @abstractmethod
+    def choose_enemy_type(self, enemy_types, context):
+        """決定要生哪一種敵人"""
+        pass
