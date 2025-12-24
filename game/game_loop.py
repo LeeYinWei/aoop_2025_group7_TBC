@@ -228,7 +228,7 @@ async def main_game_loop(screen, clock):
                             if selected_cats:
                                 game_state = "playing"
                                 current_level = levels[selected_level]
-                                camera_offset_x = 0
+                                camera_offset_x = current_level.background.get_width() - SCREEN_WIDTH
                                 current_level.reset_towers()
                                 our_tower = current_level.our_tower
                                 enemy_tower = current_level.enemy_tower
@@ -300,7 +300,7 @@ async def main_game_loop(screen, clock):
                             if selected_cats:
                                 game_state = "playing"
                                 current_level = levels[selected_level]
-                                camera_offset_x = 0
+                                camera_offset_x = current_level.background.get_width() - SCREEN_WIDTH
                                 current_level.reset_towers()
                                 our_tower = current_level.our_tower
                                 enemy_tower = current_level.enemy_tower
