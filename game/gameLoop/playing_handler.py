@@ -156,12 +156,12 @@ class PlayingHandler:
                     else:
                         self.audio.play_key_action('other_button')
 
-                    keys = pygame.key.get_pressed()
-                    if keys[pygame.K_LEFT]:
-                        camera_offset_x -= 10
-                    if keys[pygame.K_RIGHT]:
-                        camera_offset_x += 10
-                    camera_offset_x = max(0, min(camera_offset_x, bg_width - self.screen.get_width()))
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                camera_offset_x -= 10
+            if keys[pygame.K_RIGHT]:
+                camera_offset_x += 10
+            camera_offset_x = max(0, min(camera_offset_x, bg_width - self.screen.get_width()))
 
             # Budget increase
             if current_time - last_budget_increase_time >= 333:
