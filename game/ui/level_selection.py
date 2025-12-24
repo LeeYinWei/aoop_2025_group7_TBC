@@ -63,18 +63,18 @@ def draw_level_selection(screen, levels, selected_level, selected_cats, font, se
         cost_text = font.render(f"Cost: {cost}", True, (255, 255, 255))
         screen.blit(cost_text, (rect.x + 10, rect.y + 30))
 
-    reset_rect = pygame.Rect(50, 400, 200, 50)
+    reset_rect = pygame.Rect(50, 370, 200, 50)
     pygame.draw.rect(screen, (255, 100, 100), reset_rect)
     reset_text = font.render("Reset Progress", True, (255, 255, 255))
     screen.blit(reset_text, (reset_rect.x + 40, reset_rect.y + 15))
 
-    quit_rect = pygame.Rect(50, 470, 200, 50)
+    quit_rect = pygame.Rect(50, 440, 200, 50)
     pygame.draw.rect(screen, (200, 50, 50), quit_rect)
     quit_text = font.render("Quit", True, (255, 255, 255))
     screen.blit(quit_text, (quit_rect.x + 70, quit_rect.y + 15))
 
     # 添加開始按鈕
-    start_rect = pygame.Rect(50, 540, 200, 50)
+    start_rect = pygame.Rect(50, 510, 200, 50)
     pygame.draw.rect(screen, (0, 128, 0), start_rect)  # 綠色按鈕
     start_text = font.render("Start", True, (255, 255, 255))
     screen.blit(start_text, (start_rect.x + 70, start_rect.y + 15))
