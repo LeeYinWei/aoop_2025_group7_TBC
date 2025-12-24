@@ -10,7 +10,7 @@ from game.entities.smokeeffect import SmokeEffect
 from game.entities.physiceffect import PhysicEffect
 from game.constants import smoke_images, electric_images, gas_images, physic_images
 
-class Common(ABC):
+class Common(ABC):# for cat,enemy
     def __init__(self, x, y, hp, atk, speed, color, attack_range=50, is_aoe=False,
                  width=50, height=50, kb_limit=1, idle_frames=None, move_frames=None,
                  windup_frames=None, attack_frames=None, recovery_frames=None,
@@ -207,30 +207,30 @@ class Common(ABC):
         frame_index = int(self.anim_progress * frame_count) % frame_count
         return frames[frame_index]
 
-    def draw(self, screen):
+    def draw(self, screen, camera_offset_x):
         self.update_animation()
         current_frame = self.get_current_frame()
         if current_frame:
             rotated_image = pygame.transform.rotate(current_frame, self.kb_rotation)
-            rect = rotated_image.get_rect(center=(self.x + self.width / 2, self.y + self.height / 2))
+            rect = rotated_image.get_rect(center=(self.x-camera_offset_x + self.width / 2, self.y + self.height / 2))
             screen.blit(rotated_image, rect.topleft)
-        self.draw_hp_bar(screen)
+        self.draw_hp_bar(screen, camera_offset_x)
         for smoke in self.smoke_effects:
-            smoke.draw(screen)
+            smoke.draw(screen, camera_offset_x)
         for physic in self.physic_effects:
-            physic.draw(screen)
+            physic.draw(screen, camera_offset_x)
         for electric in self.electric_effects:
-            electric.draw(screen)
+            electric.draw(screen, camera_offset_x)
         for gas in self.gas_effects:
-            gas.draw(screen)
+            gas.draw(screen, camera_offset_x)
 
-    def draw_hp_bar(self, screen):
+    def draw_hp_bar(self, screen, camera_offset_x):
         bar_width = self.width
         bar_height = 5
         fill = max(0, self.hp / self.max_hp) * bar_width
-        # pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y - 10, bar_width, bar_height))
-        # pygame.draw.rect(screen, (0, 255, 0), (self.x, self.y - 10, fill, bar_height))
-        # pygame.draw.rect(screen, (0, 0, 0), (self.x, self.y - 10, bar_width, bar_height), 1)
+        # pygame.draw.rect(screen, (255, 0, 0), (self.x-camera_offset_x, self.y - 10, bar_width, bar_height))
+        # pygame.draw.rect(screen, (0, 255, 0), (self.x-camera_offset_x, self.y - 10, fill, bar_height))
+        # pygame.draw.rect(screen, (0, 0, 0), (self.x-camera_offset_x, self.y - 10, bar_width, bar_height), 1)
 
     def get_rect(self):
         return pygame.Rect(self.x, self.y, self.width, self.height)

@@ -50,7 +50,7 @@ class Tower:
             except pygame.error as e:
                 print(f"Cannot load tower image '{tower_path}': {e}")
 
-    def draw(self, screen):
+    def draw(self, screen, camera_offset_x):
         if self.image:
             offset_x = 0
             if self.is_shaking:
@@ -62,32 +62,32 @@ class Tower:
                     self.is_shaking = False
             # 繪製塔樓圖片，並加上抖動偏移
             
-            screen.blit(self.image, (self.x+offset_x, self.y))
+            screen.blit(self.image, (self.x+offset_x-camera_offset_x, self.y))
     
         else:
-            pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
-        self.draw_hp_bar(screen)
+            pygame.draw.rect(screen, self.color, (self.x-camera_offset_x, self.y, self.width, self.height))
+        self.draw_hp_bar(screen, camera_offset_x)
         # 繪製煙霧特效
         for smoke in self.smoke_effects:
-            smoke.draw(screen)
+            smoke.draw(screen, camera_offset_x)
 
         # 繪製物理特效
         for physic in self.physic_effects:
-            physic.draw(screen)
+            physic.draw(screen, camera_offset_x)
 
         for electric in self.electric_effects:
-            electric.draw(screen)
+            electric.draw(screen, camera_offset_x)
 
         for gas in self.gas_effects:
-            gas.draw(screen)
+            gas.draw(screen, camera_offset_x)
 
-    def draw_hp_bar(self, screen):
+    def draw_hp_bar(self, screen, camera_offset_x):
         bar_width = self.width
         bar_height = 5
         fill = max(0, self.hp / self.max_hp) * bar_width
-        pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y - 10, bar_width, bar_height))
-        pygame.draw.rect(screen, (0, 255, 0), (self.x, self.y - 10, fill, bar_height))
-        pygame.draw.rect(screen, (0, 0, 0), (self.x, self.y - 10, bar_width, bar_height), 1)
+        pygame.draw.rect(screen, (255, 0, 0), (self.x-camera_offset_x, self.y - 10, bar_width, bar_height))
+        pygame.draw.rect(screen, (0, 255, 0), (self.x-camera_offset_x, self.y - 10, fill, bar_height))
+        pygame.draw.rect(screen, (0, 0, 0), (self.x-camera_offset_x, self.y - 10, bar_width, bar_height), 1)
 
     def get_rect(self):
         return pygame.Rect(int(self.x), int(self.y), self.width, int(self.height))
@@ -147,7 +147,7 @@ class Tower:
     def update_gas_effects(self):
         self.gas_effects = [gas for gas in self.gas_effects if gas.update()]
 
-    def draw_collapse(self, screen):
+    def draw_collapse(self, screen, camera_offset_x):
         if self.image:
             elapsed = pygame.time.get_ticks() - self.collapsing_start_time
 
@@ -155,14 +155,14 @@ class Tower:
             offset_x = int(math.sin(elapsed * 0.05) * self.collapsing_magnitude)
             # 繪製塔樓圖片，並加上抖動偏移
             
-            screen.blit(self.image, (self.x+offset_x, self.y))
+            screen.blit(self.image, (self.x-camera_offset_x+offset_x, self.y))
     
         else:
-            pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
-        self.draw_hp_bar(screen)
+            pygame.draw.rect(screen, self.color, (self.x-camera_offset_x, self.y, self.width, self.height))
+        self.draw_hp_bar(screen, camera_offset_x)
         # 繪製煙霧特效
         for csmoke in self.csmoke_effects:
-            csmoke.draw(screen)
+            csmoke.draw(screen, camera_offset_x)
             #print("draw csmoke")
         
             

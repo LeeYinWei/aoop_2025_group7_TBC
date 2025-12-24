@@ -5,7 +5,7 @@ from game.game_loop import main_game_loop
 async def main():
     pygame.init()
     pygame.display.set_caption("The snail adventure")
-    screen = pygame.display.set_mode((1280, 600))
+    screen = pygame.display.set_mode((1280, 600)) # sreen size
     clock = pygame.time.Clock()
     await main_game_loop(screen, clock)
     # 避免直接退出，瀏覽器環境由 pygbag 管理

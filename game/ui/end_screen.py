@@ -23,7 +23,7 @@ def load_mission_complete_background_image(screen_width, screen_height):
             _mission_complete_background_image = None
     return _mission_complete_background_image
 
-def draw_end_screen(screen, current_level, status, end_font, font, our_tower, enemy_tower, start_time):
+def draw_end_screen(screen, current_level, status, end_font, font, our_tower, enemy_tower, start_time, camera_offset_x):
     # 背景
     screen.blit(current_level.background, (0, 0))
 
@@ -40,7 +40,7 @@ def draw_end_screen(screen, current_level, status, end_font, font, our_tower, en
     animated_font = pygame.font.SysFont("Arial", animated_font_size)
 
     if status == "victory":
-        enemy_tower.draw_collapse(screen)
+        enemy_tower.draw_collapse(screen, camera_offset_x)
         text_surface = animated_font.render("Victory!", True, (0, 255, 100))
         text_rect = text_surface.get_rect(center=(screen.get_width() // 2, 300))  # 螢幕中央水平對齊
         screen.blit(text_surface, text_rect)
@@ -52,7 +52,7 @@ def draw_end_screen(screen, current_level, status, end_font, font, our_tower, en
                        (continue_rect.x + 10, continue_rect.y + 10))
 
     elif status == "lose":
-        our_tower.draw_collapse(screen)
+        our_tower.draw_collapse(screen, camera_offset_x)
         text_surface = animated_font.render("Defeat!", True, (255, 100, 100))
         text_rect = text_surface.get_rect(center=(screen.get_width() // 2, 300))  # 螢幕中央水平對齊
         screen.blit(text_surface, text_rect)

@@ -59,6 +59,8 @@ boss_intro_sfx = pygame.mixer.Sound("audio/TBC/036.ogg") if os.path.exists("audi
 if not boss_intro_sfx:
     print("警告: 'audio/TBC/036.ogg' 未找到，Boss 震波音效將不會播放。")
 
+
+
 # --- 主遊戲迴圈 ---
 async def main_game_loop(screen, clock):
     FPS = 60
@@ -68,6 +70,8 @@ async def main_game_loop(screen, clock):
     budget_font = pygame.font.SysFont(None, 40)
     square_surface = pygame.Surface((1220, 480), pygame.SRCALPHA)
     square_surface.fill((150, 150, 150, 100))  # 50% 透明
+    SCREEN_WIDTH = screen.get_width()
+    camera_offset_x = 0
 
     game_state = "intro"
     from .battle_logic import update_battle
@@ -224,6 +228,7 @@ async def main_game_loop(screen, clock):
                             if selected_cats:
                                 game_state = "playing"
                                 current_level = levels[selected_level]
+                                camera_offset_x = 0
                                 current_level.reset_towers()
                                 our_tower = current_level.our_tower
                                 enemy_tower = current_level.enemy_tower
@@ -295,6 +300,7 @@ async def main_game_loop(screen, clock):
                             if selected_cats:
                                 game_state = "playing"
                                 current_level = levels[selected_level]
+                                camera_offset_x = 0
                                 current_level.reset_towers()
                                 our_tower = current_level.our_tower
                                 enemy_tower = current_level.enemy_tower
@@ -367,9 +373,10 @@ async def main_game_loop(screen, clock):
             # --- 遊戲狀態初始化與使用者介面繪製 ---
             # 獲取當前選定關卡的設定。
             current_level = levels[selected_level]
+            bg_width = current_level.background.get_width()
             # 繪製遊戲的使用者介面元素：暫停按鈕、貓咪出擊按鈕，以及與當前關卡、預算、時間相關的其他UI。
             # 函式返回暫停按鈕的矩形區域以及貓咪按鈕的矩形字典。
-            pause_rect, button_rects = draw_game_ui(screen, current_level, current_budget, enemy_tower, current_time, level_start_time, selected_cats, last_spawn_time, button_rects, font, cat_key_map, budget_font)
+            pause_rect, button_rects, camera_offset_x = draw_game_ui(screen, current_level, current_budget, enemy_tower, current_time, level_start_time, selected_cats, last_spawn_time, button_rects, font, cat_key_map, budget_font, camera_offset_x)
 
             # --- Boss 出場邏輯 ---
             # 檢查目前螢幕上是否有任何Boss敵人。
@@ -474,6 +481,14 @@ async def main_game_loop(screen, clock):
                         if key_action_sfx.get('other_button'):
                             key_action_sfx['other_button'].play() # 對於其他按鍵，播放通用音效。
 
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                camera_offset_x -= 10  # 每幀移動 10 像素
+            if keys[pygame.K_RIGHT]:
+                camera_offset_x += 10
+            # 限制捲動範圍 (假設背景圖是 bg_image)
+            camera_offset_x = max(0, min(camera_offset_x, bg_width - SCREEN_WIDTH))
+            # --------------------------
             # --- 預算增長邏輯 ---
             # 檢查自上次預算增加以來是否已經足夠的時間 (333毫秒)。
             if current_time - last_budget_increase_time >= 333:
@@ -526,22 +541,22 @@ async def main_game_loop(screen, clock):
 
             # --- 繪製所有遊戲元素 ---
             # 繪製我方塔。
-            our_tower.draw(screen)
+            our_tower.draw(screen, camera_offset_x)
             # 如果敵人塔存在，則繪製敵人塔。
             if enemy_tower:
-                enemy_tower.draw(screen)
+                enemy_tower.draw(screen, camera_offset_x)
             # 繪製所有靈魂特效。
             for soul in souls:
-                soul.draw(screen)
+                soul.draw(screen, camera_offset_x)
             # 繪製所有震波特效。
             for shockwave in shockwave_effects:
-                shockwave.draw(screen)
+                shockwave.draw(screen, camera_offset_x)
             # 繪製所有活動貓咪。
             for cat in cats:
-                cat.draw(screen)
+                cat.draw(screen, camera_offset_x)
             # 繪製所有活動敵人。
             for enemy in enemies:
-                enemy.draw(screen)
+                enemy.draw(screen, camera_offset_x)
             pygame.display.flip() # 更新整個螢幕以顯示所有繪製的內容。
 
             # --- 遊戲勝利/失敗條件檢查 ---
@@ -618,7 +633,7 @@ async def main_game_loop(screen, clock):
                     print(f"播放勝利音效，當前使用頻道數: {busy_channels}")
 
             # 使用 draw_end_screen 返回的 continue_rect
-            continue_rect = draw_end_screen(screen, current_level, status, end_font, font, our_tower, enemy_tower, victory_display_time)
+            continue_rect = draw_end_screen(screen, current_level, status, end_font, font, our_tower, enemy_tower, victory_display_time, camera_offset_x)
             pygame.display.flip()
 
             for event in pygame.event.get():

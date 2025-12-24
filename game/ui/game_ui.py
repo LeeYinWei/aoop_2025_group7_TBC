@@ -6,10 +6,11 @@ import pygame
 
 from ..entities import cat_types, cat_costs, cat_cooldowns
 
-def draw_game_ui(screen, current_level, current_budget, enemy_tower, current_time, level_start_time, selected_cats, last_spawn_time, button_rects, font, cat_key_map, budget_font):
+def draw_game_ui(screen, current_level, current_budget, enemy_tower, current_time, level_start_time, selected_cats, last_spawn_time, button_rects, font, cat_key_map, budget_font, camera_offset_x):
     background_color = (200, 255, 200)
     screen.fill(background_color)
-    screen.blit(current_level.background, (0, 0))
+    camera_offset_x = max(0, min(camera_offset_x, current_level.background.get_width() - screen.get_width()))
+    screen.blit(current_level.background, (0, 0), (camera_offset_x, 0, screen.get_width(), screen.get_height()))
     
     # Draw towers, cats, enemies, etc. (assuming this exists in your original code)
     # ... (rest of your existing draw_game_ui logic for towers, cats, enemies)
@@ -72,4 +73,4 @@ def draw_game_ui(screen, current_level, current_budget, enemy_tower, current_tim
     button_rects.clear()
     button_rects.update(calculated_button_rects)
 
-    return pause_rect, calculated_button_rects  # 返回 pause_rect 和 calculated_button_rects
+    return pause_rect, calculated_button_rects, camera_offset_x  # 返回 pause_rect 和 calculated_button_rects

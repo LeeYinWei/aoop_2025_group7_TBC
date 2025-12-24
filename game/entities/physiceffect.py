@@ -26,7 +26,7 @@ class PhysicEffect:
         #self.y -= 0  # 向上飄動
         return True
 
-    def draw(self, screen):
+    def draw(self, screen, camera_offset_x):
         now = pygame.time.get_ticks()
         elapsed = now - self.start_time
         progress = elapsed / self.duration
@@ -38,5 +38,5 @@ class PhysicEffect:
         index = min(index, len(self.frames) - 1)
 
         image = self.frames[index]
-        rect = image.get_rect(center=(self.x, self.y))
+        rect = image.get_rect(center=(self.x-camera_offset_x, self.y))
         screen.blit(image, rect)

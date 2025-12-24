@@ -29,7 +29,7 @@ class Soul:
         self.alpha = max(0, 1.0 - (elapsed / self.duration))  # 透明度漸變
         return True
 
-    def draw(self, screen):
+    def draw(self, screen, camera_offset_x):
         if self.alpha > 0:
             soul_surface = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
             pygame.draw.circle(
@@ -38,4 +38,4 @@ class Soul:
                 (self.radius, self.radius),
                 self.radius
             )
-            screen.blit(soul_surface, (self.x - self.radius, self.y - self.radius))
+            screen.blit(soul_surface, (self.x-camera_offset_x - self.radius, self.y - self.radius))

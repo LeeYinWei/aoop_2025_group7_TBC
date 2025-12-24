@@ -33,7 +33,7 @@ class Level:
         self.background = None
         try:
             self.background = pygame.image.load(background_path)
-            self.background = pygame.transform.scale(self.background, (1280, 600))
+            self.background = pygame.transform.scale(self.background, (2560, 600))#, (1280, 600)
         except pygame.error as e:
             print(f"Cannot load background image '{background_path}': {e}")
             pygame.quit()
@@ -53,8 +53,8 @@ class Level:
         self.reset_towers() # Call reset_towers after all configs are set
 
     def reset_towers(self):
-        SCREEN_WIDTH = 1280
-        CENTER_X = SCREEN_WIDTH / 2
+        bg_width = self.background.get_width()
+        CENTER_X = bg_width / 2
         our_tower_width = self.our_tower_config["width"]
         enemy_tower_width = self.enemy_tower_config["width"]
         tower_distance = self.tower_distance

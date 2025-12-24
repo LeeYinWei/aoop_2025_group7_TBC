@@ -29,7 +29,7 @@ class ShockwaveEffect:
         self.alpha = max(0, 1.0 - (elapsed / self.duration))
         return True
 
-    def draw(self, screen):
+    def draw(self, screen, camera_offset_x):
         now = pygame.time.get_ticks()
         elapsed = now - self.start_time
         progress = elapsed / self.duration
@@ -41,5 +41,5 @@ class ShockwaveEffect:
         index = min(index, len(self.frames) - 1)
 
         image = self.frames[index]
-        rect = image.get_rect(center=(self.x, self.y))
+        rect = image.get_rect(center=(self.x-camera_offset_x, self.y))
         screen.blit(image, rect)

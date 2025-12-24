@@ -31,7 +31,7 @@ class CSmokeEffect:
         return True
         '''
 
-    def draw(self, screen):
+    def draw(self, screen, camera_offset_x):#-camera_offset_x
         now = pygame.time.get_ticks()
         elapsed = now - self.start_time
         progress = elapsed / self.duration
@@ -42,8 +42,8 @@ class CSmokeEffect:
         index = min(index, len(self.frames1) - 1)
 
         image1 = self.frames1[index]
-        rect1 = image1.get_rect(center=(self.x1, self.y1))
+        rect1 = image1.get_rect(center=(self.x1-camera_offset_x, self.y1))
         screen.blit(image1, rect1)
         image2 = self.frames2[index]
-        rect2 = image2.get_rect(center=(self.x2, self.y2))
+        rect2 = image2.get_rect(center=(self.x2-camera_offset_x, self.y2))
         screen.blit(image2, rect2)

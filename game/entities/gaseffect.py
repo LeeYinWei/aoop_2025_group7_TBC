@@ -21,7 +21,7 @@ class GasEffect:
         self.y -= 0.5  # 向上飄動
         return True
 
-    def draw(self, screen):
+    def draw(self, screen, camera_offset_x):
         now = pygame.time.get_ticks()
         #print(f"GasEffect draw called at {now}, start_time: {self.start_time}, duration: {self.duration}")
         elapsed = now - self.start_time
@@ -34,5 +34,5 @@ class GasEffect:
         index = min(index, len(self.frames) - 1)
 
         image = self.frames[index]
-        rect = image.get_rect(center=(self.x, self.y))
+        rect = image.get_rect(center=(self.x-camera_offset_x, self.y))
         screen.blit(image, rect)

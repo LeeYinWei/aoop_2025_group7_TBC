@@ -27,8 +27,8 @@ class Enemy(Common):
     def get_attack_zone(self):
         return pygame.Rect(self.x + self.width, self.y, self.attack_range, self.height)
 
-    def draw(self, screen):
-        super().draw(screen)
+    def draw(self, screen, camera_offset_x):
+        super().draw(screen, camera_offset_x)
         if self.is_boss:
             boss_label = pygame.font.SysFont(None, 20).render("Boss", True, (255, 0, 0))
-            screen.blit(boss_label, (self.x, self.y - 20))
+            screen.blit(boss_label, (self.x-camera_offset_x, self.y - 20))
