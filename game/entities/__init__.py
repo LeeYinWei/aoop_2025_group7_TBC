@@ -5,6 +5,7 @@ from .cat import Cat
 from .enemy import Enemy
 from .level import Level
 from .cannonskill import CannonSkill
+from .cannonicon import CannonIcon
 from .ymanager import YManager
 from .enemyspawner import EnemySpawner
 from .spawnstrategies import OriginalSpawnStrategy, AdvancedSpawnStrategy, MLSpawnStrategy

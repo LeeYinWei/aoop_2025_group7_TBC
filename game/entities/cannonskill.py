@@ -172,5 +172,6 @@ class CannonSkill:
     # ======================================================
     def _apply_damage(self, enemies):
         for e in enemies:
-            if self.sweep_start_x <= e.x <= self.sweep_end_x:
-                e.hp -= self.damage
+            enemy_center_x = e.x + e.width // 2
+            if self.sweep_start_x <= enemy_center_x <= self.sweep_end_x:#用enemy中心點判定
+                e.take_damage(self.damage, "physic")

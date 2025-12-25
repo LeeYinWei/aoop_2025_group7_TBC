@@ -75,8 +75,8 @@ async def main_game_loop(screen, clock):
 
     from .battle_logic import update_battle
     from .ui import draw_level_selection, draw_game_ui, draw_pause_menu, draw_end_screen, draw_intro_screen, draw_ending_animation
-    from .entities import cat_types, cat_costs, cat_cooldowns, levels, enemy_types, YManager, CSmokeEffect, load_cat_images, OriginalSpawnStrategy, AdvancedSpawnStrategy, MLSpawnStrategy, EnemySpawner, CannonSkill
-    from game.constants import csmoke_images1, csmoke_images2, cannon_images
+    from .entities import cat_types, cat_costs, cat_cooldowns, levels, enemy_types, YManager, CSmokeEffect, load_cat_images, OriginalSpawnStrategy, AdvancedSpawnStrategy, MLSpawnStrategy, EnemySpawner, CannonSkill, CannonIcon
+    from game.constants import csmoke_images1, csmoke_images2, cannon_images, icon_cfg
 
     selected_level = 0
     selected_cats = list(cat_types.keys())[:2]
@@ -117,6 +117,7 @@ async def main_game_loop(screen, clock):
     our_tower = None
     enemy_tower = None
     cannon = None
+    cannon_icon = None
     last_spawn_time = {cat_type: 0 for cat_type in cat_types}
     current_budget = 1000
     last_budget_increase_time = -333
@@ -293,6 +294,7 @@ async def main_game_loop(screen, clock):
                                     sweep_fx_frames=cannon_images["sweep_fx"],
                                     after_fx_frames=cannon_images["after_fx"]
                                 )
+                                cannon_icon = CannonIcon(ui_pos=(1150, 20), icon_config=icon_cfg)
                                 current_level.reset_spawn_counts()
                                 cats.clear()
                                 souls.clear()
@@ -379,6 +381,7 @@ async def main_game_loop(screen, clock):
                                     sweep_fx_frames=cannon_images["sweep_fx"],
                                     after_fx_frames=cannon_images["after_fx"]
                                 )
+                                cannon_icon = CannonIcon(ui_pos=(1150, 20), icon_config=icon_cfg)
                                 current_level.reset_spawn_counts()
                                 cats.clear()
                                 souls.clear()
@@ -439,6 +442,12 @@ async def main_game_loop(screen, clock):
                     return
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     pos = event.pos
+                    if cannon_icon.is_clicked(pos):
+                        if cannon.state == "ready":
+                            cannon.activate(current_time)
+                            #sfx_laser.play()
+                        #else:
+                            #sfx_fail.play()
                     if pause_rect.collidepoint(pos):
                         game_state = "paused"
                         pygame.mixer.music.pause()
@@ -496,6 +505,7 @@ async def main_game_loop(screen, clock):
                     else:
                         if key_action_sfx.get('other_button'):
                             key_action_sfx['other_button'].play()
+            #處理畫面左右滑動
             keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT]:
                 camera_offset_x -= 10
@@ -533,7 +543,7 @@ async def main_game_loop(screen, clock):
             for enemy in enemies:
                 enemy.update_status_effects(current_time)
 
-            shockwave_effects = update_battle(cats, enemies, our_tower, enemy_tower, current_time, souls, cat_y_manager, enemy_y_manager, shockwave_effects, current_budget, battle_sfx)
+            shockwave_effects = update_battle(cats, enemies, our_tower, enemy_tower, current_time, souls, cat_y_manager, enemy_y_manager, cannon, shockwave_effects, current_budget, battle_sfx)
             souls = [soul for soul in souls if soul.update()]
 
             our_tower.draw(screen, camera_offset_x)
@@ -547,6 +557,19 @@ async def main_game_loop(screen, clock):
                 cat.draw(screen, camera_offset_x)
             for enemy in enemies:
                 enemy.draw(screen, camera_offset_x)
+            # 1. 繪製世界物件 (會隨 camera_offset_x 移動)
+            cannon.draw(screen, camera_offset_x)
+            
+            # 2. 繪製 UI 物件 (固定在螢幕上，不隨相機移動)
+            # 計算進度比例：只有在冷卻時才有 0~1 的進度
+            if cannon.state == "cooldown":
+                progress = min(1.0, (current_time - cannon.cooldown_start) / cannon.cooldown)
+            elif cannon.state == "ready":
+                progress = 1.0
+            else:
+                progress = 0.0 # 掃射中或後效中，顯示為 0 進度（灰階）
+
+            cannon_icon.draw(screen, cannon.state, progress, cannon.anim_index)
             pygame.display.flip()
 
             # Victory / Defeat check
