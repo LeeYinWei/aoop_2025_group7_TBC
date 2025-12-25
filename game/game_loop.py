@@ -140,7 +140,7 @@ async def main_game_loop(screen, clock):
     # 角色初始位置
     player_x, player_y = 300, 400
     player_speed = 6
-
+    player_map_pos = [player_x, player_y]  # [x, y] 用 list 讓函數可直接修改
     # 戰鬥相關變數（在 playing 時初始化）
     cats = []
     enemies = []
@@ -241,54 +241,31 @@ async def main_game_loop(screen, clock):
                             key_action_sfx['other_button'].play()
 
         elif game_state == "level_map":
-            screen.blit(level_map_bg, (0, 0))
+            from .ui.battle_menu import draw_battle_map_selection
+            
+            selected_idx, new_state = draw_battle_map_selection(
+                    screen=screen,
+                    level_map_bg=level_map_bg,
+                    snail_image=snail_image,
+                    LEVEL_NODES=LEVEL_NODES,
+                    completed_levels=completed_levels,
+                    player_pos=player_map_pos,
+                    player_speed=6,
+                    select_font=select_font
+                )
 
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-                player_x -= player_speed
-            if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-                player_x += player_speed
-            if keys[pygame.K_UP] or keys[pygame.K_w]:
-                player_y -= player_speed
-            if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-                player_y += player_speed
+            if new_state == "main_menu":
+                game_state = "main_menu"
+                if key_action_sfx.get('other_button'):
+                    key_action_sfx['other_button'].play()
 
-            player_x = max(35, min(SCREEN_WIDTH - 35, player_x))
-            player_y = max(35, min(SCREEN_HEIGHT - 35, player_y))
-
-            screen.blit(snail_image, (player_x - 35, player_y - 35))
-
-            for idx, (x, y) in enumerate(LEVEL_NODES):
-                unlocked = idx == 0 or (idx - 1) in completed_levels
-                color = (0, 255, 0) if unlocked else (100, 100, 100)
-                pygame.draw.circle(screen, color, (x, y), 50)
-                pygame.draw.circle(screen, (255, 255, 255), (x, y), 50, 5)
-                num_text = select_font.render(str(idx + 1), True, (255, 255, 255))
-                screen.blit(num_text, (x - num_text.get_width() // 2, y - num_text.get_height() // 2))
-
-                dist = ((player_x - x)**2 + (player_y - y)**2)**0.5
-                if dist < 80:
-                    pygame.draw.circle(screen, (255, 255, 0), (x, y), 60, 8)
-                    if keys[pygame.K_RETURN] or keys[pygame.K_SPACE]:
-                        if unlocked:
-                            selected_level = idx
-                            game_state = "cat_selection"
-                            if key_action_sfx.get('other_button'):
-                                key_action_sfx['other_button'].play()
-
-            back_text = font.render("按 ESC 返回主選單", True, (255, 255, 255))
-            screen.blit(back_text, (20, 20))
-
-            pygame.display.flip()
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    return
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        game_state = "main_menu"
-                        if key_action_sfx.get('other_button'):
-                            key_action_sfx['other_button'].play()
+            if selected_idx is not None:
+                selected_level = selected_idx
+                selected_cats = list(cat_types.keys())[:2]  # 重置預設貓咪
+                game_state = "cat_selection"  # 或你原本的 "cat_selection"
+                if key_action_sfx.get('other_button'):
+                    key_action_sfx['other_button'].play()
+                print(f"選擇關卡 {selected_level + 1}: {levels[selected_level].name}")
 
         elif game_state == "cat_selection":
             cat_rects, reset_rect, quit_rect, start_rect = draw_level_selection(screen, levels, selected_level, selected_cats, font, select_font, completed_levels, cat_images, square_surface)
@@ -412,13 +389,13 @@ async def main_game_loop(screen, clock):
 
         elif game_state == "gacha":
             screen.fill((50, 0, 100))
-            title = select_font.render("抽轉蛋系統開發中...", True, (255, 255, 200))
+            title = select_font.render("gacha system devoloping now!", True, (255, 255, 200))
             screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 200))
             tip = font.render("敬請期待！", True, (255, 255, 0))
             screen.blit(tip, (SCREEN_WIDTH // 2 - tip.get_width() // 2, 300))
             back_rect = pygame.Rect(50, SCREEN_HEIGHT - 100, 200, 60)
             pygame.draw.rect(screen, (200, 0, 0), back_rect, border_radius=20)
-            back_text = font.render("返回", True, (255, 255, 255))
+            back_text = font.render("back", True, (255, 255, 255))
             screen.blit(back_text, back_text.get_rect(center=back_rect.center))
             pygame.display.flip()
 
@@ -433,8 +410,6 @@ async def main_game_loop(screen, clock):
                             key_action_sfx['other_button'].play()
 
         elif game_state == "playing":
-            # 每次進入 playing 時重新初始化戰鬥變數
-            
 
             # 貓咪按鈕與鍵位
             button_rects = {cat_type: pygame.Rect(1100 + idx * 120, 50, 100, 50) for idx, cat_type in enumerate(selected_cats)}
