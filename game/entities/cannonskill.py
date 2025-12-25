@@ -8,7 +8,7 @@ class CannonSkill:
         sweep_start_x,
         range,
         ground_y,
-        sweep_duration=1200,
+        sweep_speed=0.6667,#sweep_duration=1200,
         cooldown=5000,
         damage=300,
         origin_frames=None,
@@ -24,7 +24,7 @@ class CannonSkill:
         self.sweep_start_x = sweep_start_x
         self.sweep_end_x = self.sweep_start_x-range#sweep_end_x
         self.ground_y = ground_y
-        self.sweep_duration = sweep_duration
+        self.sweep_duration = range/sweep_speed
         self.cooldown = cooldown
         self.damage = damage
 
