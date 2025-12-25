@@ -651,9 +651,10 @@ async def main_game_loop(screen, clock):
                     if event.key == pygame.K_RETURN:
                         if status == "victory":
                             completed_levels.add(selected_level)
+                            print(selected_level)
                             next_level = selected_level + 1
-                            if next_level < len(levels):
-                                completed_levels.add(next_level)
+                            # if next_level < len(levels):
+                            #     completed_levels.add(next_level)
                             try:
                                 with open(save_file, "w") as f:
                                     json.dump(list(completed_levels), f)
@@ -684,8 +685,8 @@ async def main_game_loop(screen, clock):
                         if status == "victory":
                             completed_levels.add(selected_level)
                             next_level = selected_level + 1
-                            if next_level < len(levels):
-                                completed_levels.add(next_level)
+                            # if next_level < len(levels):
+                            #     completed_levels.add(next_level)
                             try:
                                 with open(save_file, "w") as f:
                                     json.dump(list(completed_levels), f)
