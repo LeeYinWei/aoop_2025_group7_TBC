@@ -223,3 +223,4 @@ def draw_reward(pool: List[Dict[str, Any]]) -> Dict[str, Any]:
 
     # 保底（理論上不會執行到這裡）
     return pool[-1]["reward"]
+
