@@ -160,8 +160,8 @@ def load_cannonskill_images(
     # ===============================
     after_fx_frames_1 = load_sequence(
         folder="images/cannon/after_fx/1",
-        prefix="Explosion_1_",
-        frame_range=(1, 4),
+        prefix="Explosion_",
+        frame_range=(3, 6),
         step=1,
         scale=after_fx_scale1
     )

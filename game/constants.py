@@ -12,7 +12,7 @@ cannon_images = load_cannonskill_images(
     beam_scale=0.1,
     sweep_fx_scale=0.07,
     after_fx_scale1=0.5,
-    after_fx_scale2=0.45, #offset=-40
+    after_fx_scale2=0.5, #offset=-40
     alpha=255
 )
 ready, full, gray = load_cannonicon_image(scale=0.4)

@@ -149,7 +149,7 @@ class CannonSkill:
 
         tx = self.sweep_start_x + (self.sweep_end_x - self.sweep_start_x) * progress
         ty = self.ground_y
-        print(f"tx: {tx}")
+        #print(f"tx: {tx}")
 
         # 2. 計算向量與距離 (O 到 T)
         dx = tx - self.origin_x
@@ -190,7 +190,7 @@ class CannonSkill:
         ty = self.ground_y
 
         fx = self._get_frame(self.sweep_fx_frames)#self.sweep_fx_frames[self.anim_index % len(self.sweep_fx_frames)]
-        rect = fx.get_rect(center=(tx-camera_offset_x, ty))
+        rect = fx.get_rect(center=(tx-camera_offset_x, ty))#高度微調
         screen.blit(fx, rect)
 
     def _draw_after_fx(self, screen, camera_offset_x):
@@ -202,7 +202,8 @@ class CannonSkill:
         after_progress = max(0, min(1, after_progress))
 
         ty = self.ground_y
-        offset = 0
+        offsetx = 0
+        offsety = 0
         for group in self.after_fx_frames:
             if not group:
                 continue
@@ -217,14 +218,24 @@ class CannonSkill:
             # 這裡的 offset 邏輯：
             # 第一個 (0) 是目前掃過的進度點
             # 第二個 (sweep_end_x - after_x) 會讓另一個特效固定在終點等待，這取決於你的設計需求
-            rect = fx.get_rect(bottomright=(self.after_x - camera_offset_x + offset, ty))
+            rect = fx.get_rect(bottomright=(self.after_x - camera_offset_x + offsetx, ty+25+ offsety))# 高度微調
             screen.blit(fx, rect)
-            offset -= 140
+            offsetx -= 140
+            offsety -= 20
     # ======================================================
     # 傷害計算（只在掃射結束）
     # ======================================================
     def _apply_damage(self, enemies):
+        print(f"Applying damage to enemies between x={self.sweep_start_x} and x={self.sweep_end_x}")
         for e in enemies:
-            enemy_center_x = e.x + e.width // 2
-            if self.sweep_start_x <= enemy_center_x <= self.sweep_end_x:#用enemy中心點判定
+            print(f"Checking enemy at x={e.x} with width={e.width}")
+            # 獲取敵人的左右邊界
+            enemy_left = e.x
+            enemy_right = e.x + e.width
+            # 檢查敵人是否在掃射範圍內(may not correct for other direction)
+            if self.sweep_start_x >= enemy_left and enemy_right >= self.sweep_end_x:
                 e.take_damage(self.damage, "physic")
+                print(f" - Enemy at x={e.x} took {self.damage} damage!")
+                        
+            
+                
