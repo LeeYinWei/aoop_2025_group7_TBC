@@ -236,7 +236,7 @@ async def main_game_loop(screen, clock):
                         if key_action_sfx.get('other_button'):
                             key_action_sfx['other_button'].play()
                     elif gacha_rect.collidepoint(pos):
-                        game_state = "gacha"
+                        game_state = "gacha_developing"
                         if key_action_sfx.get('other_button'):
                             key_action_sfx['other_button'].play()
 
