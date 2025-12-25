@@ -73,14 +73,14 @@ async def main_game_loop(screen, clock):
 
     # 載入背景圖（如果沒有就用純色）
     try:
-        main_menu_bg = pygame.image.load("images/map_main_menu.png").convert_alpha()
+        main_menu_bg = pygame.image.load("./images/map_main_menu.png").convert_alpha()
         main_menu_bg = pygame.transform.scale(main_menu_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
     except:
         main_menu_bg = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
         main_menu_bg.fill((20, 40, 60))
 
     try:
-        level_map_bg = pygame.image.load("images/map_level_select.png").convert_alpha()
+        level_map_bg = pygame.image.load("./images/map_level_select.png").convert_alpha()
         level_map_bg = pygame.transform.scale(level_map_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
     except:
         level_map_bg = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -88,7 +88,7 @@ async def main_game_loop(screen, clock):
 
     # 蝸牛角色
     try:
-        snail_image = pygame.image.load("images/character/snail.png").convert_alpha()
+        snail_image = pygame.image.load("./images/character/snail.png").convert_alpha()
         snail_image = pygame.transform.scale(snail_image, (70, 70))
     except:
         snail_image = pygame.Surface((70, 70), pygame.SRCALPHA)
@@ -101,6 +101,7 @@ async def main_game_loop(screen, clock):
         (600, 250),   # 關卡 2
         (900, 450),   # 關卡 3
         (1100, 300),  # 關卡 4
+        (700, 600),  # 關卡 5
     ]
 
     from .battle_logic import update_battle
