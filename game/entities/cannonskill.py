@@ -6,7 +6,7 @@ class CannonSkill:
         self,
         origin_pos,
         sweep_start_x,
-        sweep_end_x,
+        range,
         ground_y,
         sweep_duration=1200,
         cooldown=5000,
@@ -15,12 +15,14 @@ class CannonSkill:
         beam_frames=None,
         sweep_fx_frames=None,
         after_fx_frames=None,  # ✅ 改成 2D： [frames_group1, frames_group2]
-        frame_duration=100
+        frame_duration1=100,
+        frame_duration2=100,
+        after_duration=1000
     ):
         # --- 基本設定 ---
         self.origin_x, self.origin_y = origin_pos
         self.sweep_start_x = sweep_start_x
-        self.sweep_end_x = sweep_end_x
+        self.sweep_end_x = self.sweep_start_x-range#sweep_end_x
         self.ground_y = ground_y
         self.sweep_duration = sweep_duration
         self.cooldown = cooldown
@@ -49,11 +51,14 @@ class CannonSkill:
         self.state = "ready"
         self.start_time = 0
         self.cooldown_start = 0
+        self.after_duration = after_duration
+        self.after_start_time = 0  # 紀錄進入 after 狀態的時間
 
         # --- 動畫 ---
         #self.anim_index = 0
         self.after_x = sweep_start_x
-        self.frame_duration = frame_duration # 例如 100ms 代表 1秒 10 張圖
+        self.frame_duration1 = frame_duration1 # for sweep_fx例如 100ms 代表 1秒 10 張圖
+        self.frame_duration2 = frame_duration2 # for sweep_fx
         self.current_time_ms = 0
     # ======================================================
     # 觸發技能
@@ -79,29 +84,35 @@ class CannonSkill:
                 # 掃射結束 → 進入後效
                 self.state = "after"
                 self.after_x = self.sweep_start_x
-
+                self.after_start_time = current_time # <--- 新增這一行
                 # 結算傷害（只在這裡一次）
                 self._apply_damage(enemies)
 
         # ---------- 掃射後地面殘影 ----------
         elif self.state == "after":
-            speed = (self.sweep_end_x - self.sweep_start_x) / (self.sweep_duration / 16)
-            self.after_x += speed
-
-            if self.after_x >= self.sweep_end_x:
+            # 計算進入 after 狀態後的進度 (0.0 ~ 1.0)
+            after_progress = (current_time - self.after_start_time) / self.after_duration
+            
+            if after_progress >= 1.0:
+                # 進度結束，進入冷卻
                 self.state = "cooldown"
                 self.cooldown_start = current_time
+            else:
+                # 根據進度更新位置：從 start_x 走到 end_x
+                self.after_x = self.sweep_start_x + (self.sweep_end_x - self.sweep_start_x) * after_progress
 
         # ---------- 冷卻 ----------
         elif self.state == "cooldown":
             if current_time - self.cooldown_start >= self.cooldown:
                 self.state = "ready"
 
-    def _get_frame(self, frames):
+    def _get_frame(self, frames, frame_duration=None):
         """根據時間計算目前該顯示哪一張圖"""
         if not frames: return None
+        if frame_duration is None:
+            frame_duration = self.frame_duration1
         # 總時間除以每幀時長，再對總幀數取餘數
-        idx = (self.current_time_ms // self.frame_duration) % len(frames)
+        idx = (self.current_time_ms // frame_duration) % len(frames)
         return frames[idx]
     
     # ======================================================
@@ -132,21 +143,43 @@ class CannonSkill:
         if not self.beam_frames:
             return
 
+        # 1. 計算當前目標點 T 的位置
         progress = (pygame.time.get_ticks() - self.start_time) / self.sweep_duration
         progress = max(0, min(1, progress))
 
         tx = self.sweep_start_x + (self.sweep_end_x - self.sweep_start_x) * progress
         ty = self.ground_y
+        print(f"tx: {tx}")
 
+        # 2. 計算向量與距離 (O 到 T)
         dx = tx - self.origin_x
         dy = ty - self.origin_y
+        distance = math.sqrt(dx**2 + dy**2)
+        
+        # 計算角度 (math.atan2 是 y, x)
+        # 這裡的 angle 計算方式取決於你原始圖片的朝向。
+        # 假設原始圖片是水平長條狀，我們要轉向 T
         angle = -math.degrees(math.atan2(dy, dx))
 
-        beam = self._get_frame(self.beam_frames)#self.beam_frames[self.anim_index % len(self.beam_frames)]
-        rotated = pygame.transform.rotate(beam, angle)
+        # 3. 獲取原始影格並進行「長度縮放」
+        # 寬度變為 distance，高度維持原本 beam 的高度
+        beam_original = self._get_frame(self.beam_frames)
+        scaled_beam = pygame.transform.scale(beam_original, (int(distance), beam_original.get_height()))
 
-        rect = rotated.get_rect(midleft=(self.origin_x-camera_offset_x, self.origin_y))
-        screen.blit(rotated, rect)
+        # 4. 旋轉圖片
+        # 注意：旋轉會導致 Surface 變大（為了容納旋轉後的斜邊）
+        rotated_beam = pygame.transform.rotate(scaled_beam, angle)
+
+        # 5. 定位：將旋轉後圖片的「右上角」對準「發射源」
+        # 我們將 origin 減去相機偏移量得到螢幕上的固定點
+        screen_origin = (self.origin_x - camera_offset_x, self.origin_y)
+        
+        # 建立 Rect 並指定 topright 位置
+        # 這樣無論長度如何變化或如何旋轉，右上角永遠鎖死在 origin
+        rect = rotated_beam.get_rect(topright=screen_origin)
+
+        # 6. 繪製
+        screen.blit(rotated_beam, rect)
 
     def _draw_sweep_fx(self, screen, camera_offset_x):
         if not self.sweep_fx_frames:
@@ -164,18 +197,29 @@ class CannonSkill:
         if not self.after_fx_frames:
             return
 
-        ty = self.ground_y
+        # 再次計算進度供繪製使用
+        after_progress = (pygame.time.get_ticks() - self.after_start_time) / self.after_duration
+        after_progress = max(0, min(1, after_progress))
 
-        # ✅ 各組用各自的 idx（依各組自己的長度循環）
+        ty = self.ground_y
+        offset = 0
         for group in self.after_fx_frames:
             if not group:
                 continue
 
-            fx = self._get_frame(group)#group[idx]
+            # 使用你原本封裝的基於時間獲取影格的函數
+            fx = self._get_frame(group, self.frame_duration2)
 
-            for offset in (0, -40):
-                rect = fx.get_rect(center=(self.after_x-camera_offset_x + offset, ty))
-                screen.blit(fx, rect)
+            # 進階：讓殘影隨進度變透明 (可選)
+            # alpha = int(255 * (1.0 - after_progress))
+            # fx.set_alpha(alpha) 
+
+            # 這裡的 offset 邏輯：
+            # 第一個 (0) 是目前掃過的進度點
+            # 第二個 (sweep_end_x - after_x) 會讓另一個特效固定在終點等待，這取決於你的設計需求
+            rect = fx.get_rect(bottomright=(self.after_x - camera_offset_x + offset, ty))
+            screen.blit(fx, rect)
+            offset -= 140
     # ======================================================
     # 傷害計算（只在掃射結束）
     # ======================================================

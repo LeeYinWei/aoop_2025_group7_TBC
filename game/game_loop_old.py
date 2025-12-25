@@ -286,15 +286,19 @@ async def main_game_loop(screen, clock):
                                     strategy = MLSpawnStrategy()
                                 enemy_spawner = EnemySpawner(strategy)
                                 cannon = CannonSkill(
-                                    origin_pos=(our_tower_center, 420),
-                                    sweep_start_x=300,
-                                    sweep_end_x=1000,
-                                    ground_y=520,
+                                    origin_pos=(our_tower_center-our_tower.width//4-10, 205),
+                                    sweep_start_x=our_tower_center-our_tower.width//2,
+                                    range=400,
+                                    ground_y=460,
+                                    sweep_duration=700,
+                                    cooldown=5000,
+                                    damage=300,
                                     origin_frames=cannon_images["origin"],
                                     beam_frames=cannon_images["beam"],
                                     sweep_fx_frames=cannon_images["sweep_fx"],
                                     after_fx_frames=cannon_images["after_fx"],
-                                    frame_duration=80
+                                    frame_duration1=80,# for sweep_fx
+                                    frame_duration2=100# for after_fx
                                 )
                                 cannon_icon = CannonIcon(ui_pos=(1090, 420), icon_config=icon_cfg, ui_frame_duration=100)
                                 current_level.reset_spawn_counts()
@@ -375,15 +379,19 @@ async def main_game_loop(screen, clock):
                                     strategy = MLSpawnStrategy()
                                 enemy_spawner = EnemySpawner(strategy)
                                 cannon = CannonSkill(
-                                    origin_pos=(our_tower_center, 420),
-                                    sweep_start_x=300,
-                                    sweep_end_x=1000,
-                                    ground_y=520,
+                                    origin_pos=(our_tower_center-our_tower.width//4-10, 205),
+                                    sweep_start_x=our_tower_center-our_tower.width//2,
+                                    range=400,
+                                    ground_y=460,
+                                    sweep_duration=700,
+                                    cooldown=5000,
+                                    damage=300,
                                     origin_frames=cannon_images["origin"],
                                     beam_frames=cannon_images["beam"],
                                     sweep_fx_frames=cannon_images["sweep_fx"],
                                     after_fx_frames=cannon_images["after_fx"],
-                                    frame_duration=80
+                                    frame_duration1=80,# for sweep_fx
+                                    frame_duration2=100# for after_fx
                                 )
                                 cannon_icon = CannonIcon(ui_pos=(1090, 420), icon_config=icon_cfg, ui_frame_duration=100)
                                 current_level.reset_spawn_counts()

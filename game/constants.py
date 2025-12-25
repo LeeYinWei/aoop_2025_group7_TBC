@@ -8,10 +8,11 @@ gas_images = load_gas_images()
 physic_images = load_physic_images()
 csmoke_images1, csmoke_images2 = load_csmoke_images()
 cannon_images = load_cannonskill_images(
-    origin_scale=1.0,
-    beam_scale=1.0,
-    sweep_fx_scale=1.0,
-    after_fx_scale=1.0,
+    origin_scale=0.07,
+    beam_scale=0.1,
+    sweep_fx_scale=0.07,
+    after_fx_scale1=0.5,
+    after_fx_scale2=0.45, #offset=-40
     alpha=255
 )
 ready, full, gray = load_cannonicon_image(scale=0.4)

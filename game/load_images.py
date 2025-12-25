@@ -93,10 +93,11 @@ import pygame
 import os
 
 def load_cannonskill_images(
-    origin_scale=1.0,
-    beam_scale=1.0,
-    sweep_fx_scale=1.0,
-    after_fx_scale=1.0,
+    origin_scale=0.1,
+    beam_scale=1.2,
+    sweep_fx_scale=0.3,
+    after_fx_scale1=0.3,
+    after_fx_scale2=0.3,
     alpha=255
 ):
     def load_sequence(folder, prefix, frame_range, step=1, scale=1.0):
@@ -162,7 +163,7 @@ def load_cannonskill_images(
         prefix="Explosion_1_",
         frame_range=(1, 4),
         step=1,
-        scale=after_fx_scale
+        scale=after_fx_scale1
     )
 
     # ✅ 第二組：請依你的實際路徑/檔名前綴修改
@@ -172,7 +173,7 @@ def load_cannonskill_images(
         prefix="Explosion_2_",
         frame_range=(1, 7),
         step=1,
-        scale=after_fx_scale
+        scale=after_fx_scale2
     )
 
     # ✅ 變成二維（兩個列表）
