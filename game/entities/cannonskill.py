@@ -97,28 +97,28 @@ class CannonSkill:
     # ======================================================
     # 繪製
     # ======================================================
-    def draw(self, screen):
+    def draw(self, screen, camera_offset_x):
         # ---------- 掃射中 ----------
         if self.state == "sweeping":
-            self._draw_origin(screen)
-            self._draw_beam(screen)
-            self._draw_sweep_fx(screen)
+            self._draw_origin(screen, camera_offset_x)
+            self._draw_beam(screen, camera_offset_x)
+            self._draw_sweep_fx(screen, camera_offset_x)
 
         # ---------- 掃射後 ----------
         elif self.state == "after":
-            self._draw_after_fx(screen)
+            self._draw_after_fx(screen, camera_offset_x)
 
     # ======================================================
     # 子功能
     # ======================================================
-    def _draw_origin(self, screen):
+    def _draw_origin(self, screen, camera_offset_x):
         if not self.origin_frames:
             return
         img = self.origin_frames[self.anim_index % len(self.origin_frames)]
-        rect = img.get_rect(center=(self.origin_x, self.origin_y))
+        rect = img.get_rect(center=(self.origin_x-camera_offset_x, self.origin_y))
         screen.blit(img, rect)
 
-    def _draw_beam(self, screen):
+    def _draw_beam(self, screen, camera_offset_x):
         if not self.beam_frames:
             return
 
@@ -135,10 +135,10 @@ class CannonSkill:
         beam = self.beam_frames[self.anim_index % len(self.beam_frames)]
         rotated = pygame.transform.rotate(beam, angle)
 
-        rect = rotated.get_rect(midleft=(self.origin_x, self.origin_y))
+        rect = rotated.get_rect(midleft=(self.origin_x-camera_offset_x, self.origin_y))
         screen.blit(rotated, rect)
 
-    def _draw_sweep_fx(self, screen):
+    def _draw_sweep_fx(self, screen, camera_offset_x):
         if not self.sweep_fx_frames:
             return
 
@@ -147,10 +147,10 @@ class CannonSkill:
         ty = self.ground_y
 
         fx = self.sweep_fx_frames[self.anim_index % len(self.sweep_fx_frames)]
-        rect = fx.get_rect(center=(tx, ty))
+        rect = fx.get_rect(center=(tx-camera_offset_x, ty))
         screen.blit(fx, rect)
 
-    def _draw_after_fx(self, screen):
+    def _draw_after_fx(self, screen, camera_offset_x):
         if not self.after_fx_frames:
             return
 
@@ -165,7 +165,7 @@ class CannonSkill:
             fx = group[idx]
 
             for offset in (0, -40):
-                rect = fx.get_rect(center=(self.after_x + offset, ty))
+                rect = fx.get_rect(center=(self.after_x-camera_offset_x + offset, ty))
                 screen.blit(fx, rect)
     # ======================================================
     # 傷害計算（只在掃射結束）
