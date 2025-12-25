@@ -111,6 +111,8 @@ async def main_game_loop(screen, clock):
     except Exception as e:
         print(f"Warning: failed to load player resources: {e}")
 
+
+
     # Game entities and state
     cats = []
     enemies = []
