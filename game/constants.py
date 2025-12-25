@@ -14,7 +14,7 @@ cannon_images = load_cannonskill_images(
     after_fx_scale=1.0,
     alpha=255
 )
-ready, full, gray = load_cannonicon_image(scale=1.0)
+ready, full, gray = load_cannonicon_image(scale=0.4)
 icon_cfg = {
     'ready': [ready[0], ready[1]], # 動畫
     'full': full,             # 原圖

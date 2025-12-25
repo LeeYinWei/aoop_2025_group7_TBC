@@ -296,7 +296,7 @@ async def main_game_loop(screen, clock):
                                     after_fx_frames=cannon_images["after_fx"],
                                     frame_duration=80
                                 )
-                                cannon_icon = CannonIcon(ui_pos=(1150, 20), icon_config=icon_cfg, ui_frame_duration=800)
+                                cannon_icon = CannonIcon(ui_pos=(1090, 420), icon_config=icon_cfg, ui_frame_duration=100)
                                 current_level.reset_spawn_counts()
                                 cats.clear()
                                 souls.clear()
@@ -385,7 +385,7 @@ async def main_game_loop(screen, clock):
                                     after_fx_frames=cannon_images["after_fx"],
                                     frame_duration=80
                                 )
-                                cannon_icon = CannonIcon(ui_pos=(1150, 20), icon_config=icon_cfg, ui_frame_duration=800)
+                                cannon_icon = CannonIcon(ui_pos=(1090, 420), icon_config=icon_cfg, ui_frame_duration=100)
                                 current_level.reset_spawn_counts()
                                 cats.clear()
                                 souls.clear()
