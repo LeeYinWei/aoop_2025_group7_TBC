@@ -75,6 +75,8 @@ async def main_game_loop(screen, clock):
 
     from .battle_logic import update_battle
     from .ui import draw_level_selection, draw_game_ui, draw_pause_menu, draw_end_screen, draw_intro_screen, draw_ending_animation
+    from .ui import draw_battle_gacha, battle_gacha_loop
+
     from .entities import cat_types, cat_costs, cat_cooldowns, levels, enemy_types, YManager, CSmokeEffect, load_cat_images, OriginalSpawnStrategy, AdvancedSpawnStrategy, MLSpawnStrategy, EnemySpawner
     from game.constants import csmoke_images1, csmoke_images2
 
@@ -109,6 +111,8 @@ async def main_game_loop(screen, clock):
     except Exception as e:
         print(f"Warning: failed to load player resources: {e}")
 
+
+
     # Game entities and state
     cats = []
     enemies = []
@@ -138,7 +142,8 @@ async def main_game_loop(screen, clock):
     total_gold_earned = 0
     total_souls_earned = 0
     is_first_completion = False
-
+    # game state: intro, level_selection, playing, paused, ending, end
+    #=> intro, battle_gacha, level_selection, choosing charater, playing, paused, ending, end
     while True:
         current_time = pygame.time.get_ticks()
         screen.fill((0, 0, 0))
@@ -161,22 +166,37 @@ async def main_game_loop(screen, clock):
                 y_offset = screen.get_height() * (1 - text_scroll_progress * text_scroll_progress)
             skip_rect = draw_intro_screen(screen, font, y_offset, current_fade_alpha)
             pygame.display.flip()
+            # 點擊事件
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if skip_rect.collidepoint(event.pos):
-                        game_state = "level_selection"
+                        game_state = "battle_gacha"
                         pygame.mixer.music.stop()
                         current_bgm_path = None
                         if key_action_sfx.get('other_button'):
                             key_action_sfx['other_button'].play()
                         print("Skipped intro animation.")
             if elapsed_intro_time >= intro_duration + DELAY_TIME:
-                game_state = "level_selection"
+                game_state = "battle_gacha"
                 pygame.mixer.music.stop()
                 current_bgm_path = None
                 print("Intro animation finished.")
+
+        
+        elif game_state == "battle_gacha":
+            next_state = battle_gacha_loop(screen, clock)
+            game_state = next_state
+                
+
+        elif game_state == "map_level":
+            from game.ui.map_level import draw_map_level_selection
+            map_level = draw_map_level_selection(screen, clock)
+
+
+            # game_state = "level_selection"
+
 
         elif game_state == "level_selection":
             if pygame.mixer.music.get_busy():
@@ -475,12 +495,12 @@ async def main_game_loop(screen, clock):
                     else:
                         if key_action_sfx.get('other_button'):
                             key_action_sfx['other_button'].play()
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_LEFT]:
-                camera_offset_x -= 10
-            if keys[pygame.K_RIGHT]:
-                camera_offset_x += 10
-            camera_offset_x = max(0, min(camera_offset_x, bg_width - SCREEN_WIDTH))
+                    keys = pygame.key.get_pressed()
+                    if keys[pygame.K_LEFT]:
+                        camera_offset_x -= 10
+                    if keys[pygame.K_RIGHT]:
+                        camera_offset_x += 10
+                    camera_offset_x = max(0, min(camera_offset_x, bg_width - SCREEN_WIDTH))
 
             # Budget increase
             if current_time - last_budget_increase_time >= 333:
