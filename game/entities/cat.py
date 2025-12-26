@@ -55,7 +55,7 @@ class Cat(Common):
                 self.kb_start_time = pygame.time.get_ticks()
                 self.kb_progress = 0
                 self.anim_state = "knockback"
-                # self.kb_count += 1
+                
                 if self.kb_count >= self.kb_limit:
                     self.hp = 0
 
