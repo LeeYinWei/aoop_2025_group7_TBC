@@ -447,7 +447,7 @@ async def main_game_loop(screen, clock):
             bg_width = current_level.background.get_width()
 
             # 繪製遊戲 UI（返回 pause_rect 與更新後的 camera_offset_x）
-            pause_rect, button_rects, camera_offset_x = draw_game_ui(
+            pause_rect, button_rects, camera_offset_x, _ = draw_game_ui(
                 screen, current_level, current_budget, enemy_tower, current_time, level_start_time,
                 selected_cats, last_spawn_time, button_rects, font, cat_key_map, budget_font, camera_offset_x
             )
