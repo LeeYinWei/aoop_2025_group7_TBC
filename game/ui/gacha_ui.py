@@ -107,17 +107,18 @@ def draw_gacha_screen(
         250,
         100
     )
-    pygame.draw.rect(screen, (70, 40, 120), btn_rect, border_radius=15)
-    pygame.draw.rect(screen, (255, 255, 255), btn_rect, 3, border_radius=15)
+    if not gacha_is_anim_playing and not gacha_is_fading and not gacha_show_result:
+        pygame.draw.rect(screen, (70, 40, 120), btn_rect, border_radius=15)
+        pygame.draw.rect(screen, (255, 255, 255), btn_rect, 3, border_radius=15)
 
-    label = font.render("Roll Single", True, (255, 255, 255))
-    screen.blit(label, label.get_rect(center=btn_rect.center))
+        label = font.render("Roll Single", True, (255, 255, 255))
+        screen.blit(label, label.get_rect(center=btn_rect.center))
 
-    # 返回
-    back_rect = pygame.Rect(50, SCREEN_HEIGHT - 100, 150, 60)
-    pygame.draw.rect(screen, (150, 50, 50), back_rect, border_radius=15)
-    back_text = font.render("Back", True, (255, 255, 255))
-    screen.blit(back_text, back_text.get_rect(center=back_rect.center))
+        # 返回
+        back_rect = pygame.Rect(50, SCREEN_HEIGHT - 100, 150, 60)
+        pygame.draw.rect(screen, (150, 50, 50), back_rect, border_radius=15)
+        back_text = font.render("Back", True, (255, 255, 255))
+        screen.blit(back_text, back_text.get_rect(center=back_rect.center))
 
     # -------------------------
     # 播放動畫
@@ -208,12 +209,12 @@ def draw_gacha_screen(
             new_game_state = "quit"
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            if gacha_is_anim_playing or gacha_is_fading or gacha_show_result: 
+                    continue
             if back_rect.collidepoint(event.pos):
                 new_game_state = "main_menu"
 
             elif btn_rect.collidepoint(event.pos):
-                if gacha_is_anim_playing:
-                    continue
 
                 success, result = perform_gacha()
                 if success:
