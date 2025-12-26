@@ -813,6 +813,22 @@ async def main_game_loop(screen, clock):
                                 setattr(pygame.time, "victory_display_time", 0)
                                 if key_action_sfx.get('other_button'):
                                     key_action_sfx['other_button'].play()
+                        elif status == "lose":
+                            game_state = "main_menu"
+                            our_tower = None
+                            enemy_tower = None
+                            cats.clear()
+                            enemies.clear()
+                            souls.clear()
+                            shockwave_effects.clear()
+                            current_budget = 1000
+                            pygame.mixer.music.stop()
+                            current_bgm_path = None
+                            boss_music_active = False
+                            boss_shockwave_played = False
+                            setattr(pygame.time, "victory_display_time", 0)
+                            if key_action_sfx.get('other_button'):
+                                key_action_sfx['other_button'].play()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     pos = event.pos
                     if continue_rect and continue_rect.collidepoint(pos):
@@ -842,6 +858,22 @@ async def main_game_loop(screen, clock):
                                 setattr(pygame.time, "victory_display_time", 0)
                                 if key_action_sfx.get('other_button'):
                                     key_action_sfx['other_button'].play()
+                        elif status == "lose":
+                            game_state = "main_menu"
+                            our_tower = None
+                            enemy_tower = None
+                            cats.clear()
+                            enemies.clear()
+                            souls.clear()
+                            shockwave_effects.clear()
+                            current_budget = 1000
+                            pygame.mixer.music.stop()
+                            current_bgm_path = None
+                            boss_music_active = False
+                            boss_shockwave_played = False
+                            setattr(pygame.time, "victory_display_time", 0)
+                            if key_action_sfx.get('other_button'):
+                                key_action_sfx['other_button'].play()
 
         elif game_state == "ending":
             ending_start_time = getattr(pygame.time, "ending_start_time", pygame.time.get_ticks())
