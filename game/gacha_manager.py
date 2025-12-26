@@ -6,42 +6,36 @@ from  .constants import GACHA_COST_GOLD, GACHA_COST_SOULS, RESOURCE_FILE, UNLOCK
 
 def perform_gacha():
     """
-    執行轉蛋邏輯並更新 JSON
-    返回: (是否成功, 抽中結果文字, 更新後的資料字典)
+    執行轉蛋邏輯
+    回傳: (success, result_dict)
     """
-    # 1. 讀取資源檔案
     if not os.path.exists(RESOURCE_FILE):
-        return False, "Resource file missing!", {}
+        return False, {"msg": "File Missing"}
     
     with open(RESOURCE_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    # 2. 檢查資源 (注意你的鍵名是 'souls' 有個 s)
+    # 1. 資源檢查
     if data["gold"] < GACHA_COST_GOLD or data["souls"] < GACHA_COST_SOULS:
-        return False, "Not enough Gold or Souls!", data
+        return False, {"msg": "Insufficient Resources!"}
 
-    # 3. 扣除資源
+    # 2. 扣除資源並存檔
     data["gold"] -= GACHA_COST_GOLD
     data["souls"] -= GACHA_COST_SOULS
-
-    # 4. 隨機抽取邏輯
-    # 這裡放你所有的角色 ID（對應你角色清單的字串）
-    all_cats = ["basic","speedy","eraser","mtank","tank", "kp"]
-    
-    # 30% 機率槓龜，70% 抽中
-    if random.random() < 0.3:
-        result_msg = "Nothing... Try again!"
-        won_cat = None
-    else:
-        won_cat = random.choice(all_cats)
-        result_msg = f"Obtained: {won_cat}!"
-
-    # 5. 更新檔案：資源檔
     with open(RESOURCE_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
 
-    # 6. 更新檔案：已解鎖角色檔 (如果有抽中)
-    if won_cat:
+    # 3. 抽獎
+    all_cats = ["basic", "speedy", "eraser", "mtank", "tank", "kp"]
+    result = {"won_id": None, "is_new": False, "msg": ""}
+
+    if random.random() < 0.2: # 20% 沒抽中
+        result["msg"] = "Try Again!"
+    else:
+        won_cat = random.choice(all_cats)
+        result["won_id"] = won_cat
+        
+        # 讀取已解鎖清單
         unlocked = []
         if os.path.exists(UNLOCKED_FILE):
             with open(UNLOCKED_FILE, "r", encoding="utf-8") as f:
@@ -49,9 +43,12 @@ def perform_gacha():
         
         if won_cat not in unlocked:
             unlocked.append(won_cat)
+            result["is_new"] = True
             with open(UNLOCKED_FILE, "w", encoding="utf-8") as f:
                 json.dump(unlocked, f, indent=4)
+            result["msg"] = f"NEW HERO: {won_cat.upper()}!"
         else:
-            result_msg += " (Already owned)"
+            result["is_new"] = False
+            result["msg"] = f"GOT {won_cat.upper()} (Duplicate)"
 
-    return True, result_msg, data
+    return True, result
