@@ -1,4 +1,5 @@
 from .load_images import* 
+from .gachaanimationplayer import GachaAnimationPlayer
 import os
 
 ## constants.py
@@ -47,7 +48,7 @@ GACHA_COST_SOULS = 5
 # constants.py 的所在資料夾 → game/
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# repo 根目錄
+# repo 根目錄(game/ 的上層) → home/.../aoop_2025_group7_TBC/
 ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
 
 # data 資料夾
@@ -56,3 +57,9 @@ DATA_DIR = os.path.join(ROOT_DIR, "data")
 # 檔案路徑
 RESOURCE_FILE = os.path.join(DATA_DIR, "player_resources.json")
 UNLOCKED_FILE = os.path.join(DATA_DIR, "player_unlocked_cats.json")
+
+gacha_anim_player = GachaAnimationPlayer(   
+    frame_paths=[os.path.join(ROOT_DIR, "images/gacha_rotate", f) for f in sorted(os.listdir(os.path.join(ROOT_DIR, "images/gacha_rotate"))) if f.endswith(".jpg")],
+      pos=(640, 300),
+      frame_duration=50
+)

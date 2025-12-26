@@ -24,8 +24,7 @@ player_resources = {"gold": 0, "souls": 0}
 selected_cats = []
 selected_level = 0
 game_state = "intro"
-gacha_is_anim_playing = False
-gacha_result = None
+
 
 
 # first_clear 領取記錄
@@ -97,6 +96,8 @@ async def main_game_loop(screen, clock):
     global selected_cats, selected_level, game_state, intro_start_time
     global current_bgm_path, boss_music_active, boss_shockwave_played
     global wallet_level, total_budget_limitation, budget_rate
+    gacha_is_anim_playing = False
+    gacha_result = None
 
     FPS = 60
     font = pygame.font.SysFont(None, 25)
@@ -144,9 +145,9 @@ async def main_game_loop(screen, clock):
 
     # Import entities and UI
     from .battle_logic import update_battle
-    from .ui import draw_game_ui, draw_pause_menu, draw_end_screen, draw_intro_screen, draw_ending_animation, draw_level_selection, GachaAnimationPlayer
+    from .ui import draw_game_ui, draw_pause_menu, draw_end_screen, draw_intro_screen, draw_ending_animation, draw_level_selection
     from .entities import cat_types, cat_costs, cat_cooldowns, levels, enemy_types, YManager, CSmokeEffect, load_cat_images, OriginalSpawnStrategy, AdvancedSpawnStrategy, MLSpawnStrategy, EnemySpawner, CannonSkill, CannonIcon
-    from game.constants import csmoke_images1, csmoke_images2, cannon_images, icon_cfg, gacha_background
+    from game.constants import csmoke_images1, csmoke_images2, cannon_images, icon_cfg, gacha_background, gacha_anim_player
 
     # Battle variables
     cats = []
@@ -346,7 +347,7 @@ async def main_game_loop(screen, clock):
                         game_state = "gacha"
                         if key_action_sfx.get('other_button'):
                             key_action_sfx['other_button'].play()
-                        gacha_anim_player = GachaAnimationPlayer(
+
 
         elif game_state == "level_map":
             # 關卡選擇與貓咪選擇共用音樂
