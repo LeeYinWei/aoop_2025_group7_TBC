@@ -97,7 +97,11 @@ async def main_game_loop(screen, clock):
     global current_bgm_path, boss_music_active, boss_shockwave_played
     global wallet_level, total_budget_limitation, budget_rate
     gacha_is_anim_playing = False
+    gacha_is_fading = False          # 白畫面淡出中
+    gacha_show_result = False        # 顯示結果中
+    gacha_fade_alpha = 255           # 白畫面透明度
     gacha_result = None
+
 
     FPS = 60
     font = pygame.font.SysFont(None, 25)
@@ -561,7 +565,7 @@ async def main_game_loop(screen, clock):
                 print("返回主選單 from 轉蛋頁面")
         elif game_state == "gacha":
             from .ui.gacha_ui import draw_gacha_screen # 確保路徑對
-            new_state, gacha_is_anim_playing, gacha_result = draw_gacha_screen(
+            new_state, gacha_is_anim_playing, gacha_result, gacha_is_fading, gacha_show_result, gacha_fade_alpha = draw_gacha_screen(
                 screen,
                 select_font,
                 font,
@@ -569,6 +573,9 @@ async def main_game_loop(screen, clock):
                 gacha_anim_player,
                 gacha_is_anim_playing,
                 gacha_result,
+                gacha_is_fading, 
+                gacha_show_result, 
+                gacha_fade_alpha,
                 key_action_sfx
             )
             if new_state == "main_menu":

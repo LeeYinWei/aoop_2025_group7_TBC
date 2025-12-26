@@ -70,6 +70,9 @@ def draw_gacha_screen(
     gacha_anim_player,
     gacha_is_anim_playing,
     gacha_result,
+    gacha_is_fading,
+    gacha_show_result,
+    gacha_fade_alpha,
     key_action_sfx=None
 ):
     from ..gacha_manager import perform_gacha
@@ -124,6 +127,63 @@ def draw_gacha_screen(
         still_playing = gacha_anim_player.draw(screen, current_time)
         if not still_playing:
             gacha_is_anim_playing = False
+            gacha_is_fading = True
+            gacha_fade_alpha = 255
+
+    if gacha_is_fading:
+        white = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        white.fill((255, 255, 255))
+        white.set_alpha(gacha_fade_alpha)
+        screen.blit(white, (0, 0))
+
+        gacha_fade_alpha -= 8   # 調整淡出速度
+        if gacha_fade_alpha <= 0:
+            gacha_is_fading = False
+            gacha_show_result = True
+    
+    if gacha_show_result:
+        screen.blit(gacha_bg, (0, 0))  # 或另一張 result_bg
+
+    if gacha_show_result and gacha_result:
+
+        msg = gacha_result["msg"]
+        is_win = gacha_result["won_id"] is not None
+
+        if is_win:
+            # 顯示貓咪圖片
+            cat_img = pygame.image.load(
+                f"assets/cats/{gacha_result['won_id']}.png"
+            ).convert_alpha()
+
+            cat_rect = cat_img.get_rect(
+                center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 50)
+            )
+            screen.blit(cat_img, cat_rect)
+
+            # 大字 msg
+            text = select_font.render(msg, True, (255, 215, 0))
+            screen.blit(
+                text,
+                text.get_rect(
+                    center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 120)
+                )
+            )
+        else:
+            # 沒中 → 小一點、靠中間
+            text = font.render(msg, True, (200, 200, 200))
+            screen.blit(
+                text,
+                text.get_rect(
+                    center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+                )
+            )
+        hint = font.render("Press ENTER to continue", True, (180, 180, 180))
+        screen.blit(
+            hint,
+            hint.get_rect(
+                center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 80)
+            )
+        )
 
     # -------------------------
     # 顯示結果
@@ -162,8 +222,15 @@ def draw_gacha_screen(
                     gacha_anim_player.start(pygame.time.get_ticks())
 
         elif event.type == pygame.KEYDOWN:
+
             if event.key == pygame.K_ESCAPE:
                 new_game_state = "main_menu"
 
+            if event.key == pygame.K_RETURN and gacha_show_result:
+                # reset 狀態
+                gacha_show_result = False
+                gacha_result = None
+
+
     # 🔴 重點：把狀態「傳回去」
-    return new_game_state, gacha_is_anim_playing, gacha_result
+    return new_game_state, gacha_is_anim_playing, gacha_result, gacha_is_fading, gacha_show_result, gacha_fade_alpha

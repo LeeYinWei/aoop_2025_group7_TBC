@@ -1,6 +1,7 @@
 from .load_images import* 
 from .gachaanimationplayer import GachaAnimationPlayer
 import os
+import re
 
 ## constants.py
 BOTTOM_Y = 490
@@ -57,9 +58,29 @@ DATA_DIR = os.path.join(ROOT_DIR, "data")
 # 檔案路徑
 RESOURCE_FILE = os.path.join(DATA_DIR, "player_resources.json")
 UNLOCKED_FILE = os.path.join(DATA_DIR, "player_unlocked_cats.json")
+GACHA_FRAMES_DIR = os.path.join(ROOT_DIR, "images", "gacha_rotate")
 
-gacha_anim_player = GachaAnimationPlayer(   
-    frame_paths=[os.path.join(ROOT_DIR, "images/gacha_rotate", f) for f in sorted(os.listdir(os.path.join(ROOT_DIR, "images/gacha_rotate"))) if f.endswith(".jpg")],
-      pos=(640, 300),
-      frame_duration=50
+def _frame_index(filename: str) -> int:
+    """
+    支援：
+      frame_0.jpg, frame_12.jpg, frame_000123.jpg
+    取不到數字的檔案會排到最後。
+    """
+    m = re.search(r"frame_(\d+)\.jpg$", filename)
+    return int(m.group(1)) if m else 10**18
+
+frame_files = [
+    f for f in os.listdir(GACHA_FRAMES_DIR)
+    if f.lower().endswith(".jpg") and f.startswith("frame_")
+]
+
+frame_files_sorted = sorted(frame_files, key=_frame_index)
+
+frame_paths = [os.path.join(GACHA_FRAMES_DIR, f) for f in frame_files_sorted]
+print(frame_paths)
+
+gacha_anim_player = GachaAnimationPlayer(
+    frame_paths=frame_paths,
+    pos=(640, 300),
+    frame_duration=150
 )
