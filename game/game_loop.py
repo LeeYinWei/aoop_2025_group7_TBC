@@ -576,7 +576,8 @@ async def main_game_loop(screen, clock):
             pause_rect, button_rects, camera_offset_x, upgrade_rect = draw_game_ui(
                 screen, current_level, current_budget, enemy_tower, current_time, level_start_time,
                 selected_cats, last_spawn_time, button_rects, font, cat_key_map, budget_font, camera_offset_x,
-                wallet_level, wallet_upgrade_table, player_resources
+                wallet_level, wallet_upgrade_table, player_resources,
+                cat_images=cat_images
             )
 
             # Boss 登場邏輯
