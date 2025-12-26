@@ -1,7 +1,7 @@
 cat_config = {
     "id":101,
     "hp": 100000,
-    "atk": 400,
+    "atk": 200,
     "speed": 4,
     "color": (0, 255, 255),
     "attack_range": 210,
@@ -11,9 +11,9 @@ cat_config = {
     "cost": 80,
     "width":200,
     "height": 200,
-    "windup_duration": 200,
-    "attack_duration": 100,
-    "recovery_duration": 200,
+    "windup_duration": 400,
+    "attack_duration": 50,
+    "recovery_duration": 400,
     "attack_interval": 10000,
     "idle_frames": ["cat_folder/kp/walking/urudcd8G.png"],#900
     "move_frames": [f"cat_folder/kp/walking/urudcd8G.png"],
@@ -22,7 +22,7 @@ cat_config = {
         ,
     "attack_frames": [f"cat_folder/kp/attacking/frame_0000{i}.png" for i in range(95, 100)]\
         +[f"cat_folder/kp/attacking/frame_000{i}.png" for i in range(100, 103)],
-    "recovery_frames": [f"cat_folder/kp/attacking/frame_000{i}.png" for i in range(103, 121)],
+    "recovery_frames": [f"cat_folder/kp/attacking/frame_000{i}.png" for i in range(103, 170)],
     
     "kb_frames": [],
     "delta_y": -42, # 微調 y 座標
