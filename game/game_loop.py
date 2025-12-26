@@ -468,12 +468,18 @@ async def main_game_loop(screen, clock):
                             souls = []
                             shockwave_effects = []
 
+                            # 初始化冷卻時間為完成狀態
+                            current_time = pygame.time.get_ticks()
+                            last_spawn_time = {cat_type: current_time - cat_cooldowns.get(cat_type, 0) - 1 
+                                              for cat_type in cat_types}
+                            # 只保留 selected_cats 的冷卻時間
+                            last_spawn_time = {cat_type: last_spawn_time[cat_type] 
+                                              for cat_type in selected_cats if cat_type in last_spawn_time}
+
                             wallet_level = 1
                             update_wallet_stats()
-
                             current_budget = current_level.initial_budget
                             last_budget_increase_time = current_time - 333
-                            last_spawn_time = {cat_type: 0 for cat_type in cat_types}
                             level_start_time = current_time
                             status = None
 
@@ -717,6 +723,13 @@ async def main_game_loop(screen, clock):
                     status = "victory"
                     game_state = "end"
                     # ... 音效 ...
+                    pygame.mixer.music.stop()
+                    current_bgm_path = None
+                    boss_music_active = False
+                    boss_shockwave_played = False
+                    if victory_sfx:
+                        victory_sfx.set_volume(0.8)
+                        victory_sfx.play()
 
                     clear_time_seconds = (current_time - level_start_time) / 1000
                     reward_data = LEVEL_REWARDS.get(selected_level, {})
@@ -846,6 +859,9 @@ async def main_game_loop(screen, clock):
             current_level = levels[selected_level]
             is_last_level = selected_level == len(levels) - 1
             victory_display_time = getattr(pygame.time, "victory_display_time", 0)
+
+            is_first_victory = selected_level in levels
+
             if status == "victory" and victory_display_time == 0:
                 pygame.time.victory_display_time = pygame.time.get_ticks()
             continue_rect = draw_end_screen(screen, current_level, status, end_font, font, our_tower, enemy_tower, victory_display_time, camera_offset_x)
@@ -876,7 +892,7 @@ async def main_game_loop(screen, clock):
                                     json.dump(list(completed_levels), f)
                             except Exception as e:
                                 print(f"Save error: {e}")
-                            if status == "victory" and is_last_level:
+                            if status == "victory" and is_last_level and is_first_victory:
                                 game_state = "ending"
                                 pygame.time.ending_start_time = pygame.time.get_ticks()
                             else:
@@ -921,7 +937,7 @@ async def main_game_loop(screen, clock):
                                     json.dump(list(completed_levels), f)
                             except Exception as e:
                                 print(f"Save error: {e}")
-                            if status == "victory" and is_last_level:
+                            if status == "victory" and is_last_level and is_first_victory:
                                 game_state = "ending"
                                 pygame.time.ending_start_time = pygame.time.get_ticks()
                             else:
