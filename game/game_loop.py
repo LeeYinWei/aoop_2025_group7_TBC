@@ -32,7 +32,7 @@ claimed_first_clear = {"0": [[], []], "1": [[], []], "2": [[], []], "3": [[], []
 wallet_level = 1
 wallet_upgrade_table = []
 
-# 目前戰鬥中的錢包參數（會隨升級即時更新）
+# 目前戰鬥中的錢包參數
 total_budget_limitation = 6000
 budget_rate = 20
 
@@ -66,7 +66,7 @@ try:
 except Exception as e:
     print(f"Error loading wallet upgrade table: {e}")
     wallet_upgrade_table = []
-
+# print(f"Loaded wallet upgrade table: {wallet_upgrade_table}")
 # 載入玩家錢包等級
 try:
     if os.path.exists(WALLET_LEVEL_FILE):
@@ -88,8 +88,6 @@ def update_wallet_stats():
     else:
         total_budget_limitation = 16500
         budget_rate = 55
-
-update_wallet_stats()
 
 async def main_game_loop(screen, clock):
     global unlocked_cats, completed_levels, player_resources
@@ -206,33 +204,55 @@ async def main_game_loop(screen, clock):
     boss_music_active = False
     boss_shockwave_played = False
 
+    # 音效通道設定（每種音效獨立通道，避免重疊）
+    pygame.mixer.set_num_channels(16)
+    victory_channel = pygame.mixer.Channel(0)
+    defeat_channel = pygame.mixer.Channel(1)
+    boss_intro_channel = pygame.mixer.Channel(2)
+    cat_spawn_channel = pygame.mixer.Channel(3)
+    hit_unit_channel = pygame.mixer.Channel(4)
+    hit_tower_channel = pygame.mixer.Channel(5)
+    unit_die_channel = pygame.mixer.Channel(6)
+    key_action_channel = pygame.mixer.Channel(7)
+
     # Sound loading
     cat_spawn_sfx = {}
     if os.path.exists("audio/TBC/010.ogg"):
         cat_spawn_sfx['default'] = pygame.mixer.Sound("audio/TBC/010.ogg")
         cat_spawn_sfx['default'].set_volume(0.7)
 
-    victory_sfx = pygame.mixer.Sound("audio/TBC/008.ogg") if os.path.exists("audio/TBC/008.ogg") else None
-    defeat_sfx = pygame.mixer.Sound("audio/TBC/009.ogg") if os.path.exists("audio/TBC/009.ogg") else None
-    boss_intro_sfx = pygame.mixer.Sound("audio/TBC/036.ogg") if os.path.exists("audio/TBC/036.ogg") else None
+    victory_sfx = None
+    if os.path.exists("audio/TBC/008.ogg"):
+        victory_sfx = pygame.mixer.Sound("audio/TBC/008.ogg")
+        victory_sfx.set_volume(0.8)
+
+    defeat_sfx = None
+    if os.path.exists("audio/TBC/009.ogg"):
+        defeat_sfx = pygame.mixer.Sound("audio/TBC/009.ogg")
+        defeat_sfx.set_volume(0.8)
+
+    boss_intro_sfx = None
+    if os.path.exists("audio/TBC/036.ogg"):
+        boss_intro_sfx = pygame.mixer.Sound("audio/TBC/036.ogg")
+        boss_intro_sfx.set_volume(0.7)
 
     key_action_sfx = {
         'cannot_deploy': pygame.mixer.Sound("audio/TBC/015.ogg") if os.path.exists("audio/TBC/015.ogg") else None,
         'can_deploy': pygame.mixer.Sound("audio/TBC/014.ogg") if os.path.exists("audio/TBC/014.ogg") else None,
         'other_button': pygame.mixer.Sound("audio/TBC/011.ogg") if os.path.exists("audio/TBC/011.ogg") else None
     }
-    for key, sfx in key_action_sfx.items():
+    for sfx in key_action_sfx.values():
         if sfx:
-            sfx.set_volume(0.6 if key in ['cannot_deploy', 'can_deploy'] else 0.5)
+            sfx.set_volume(0.6)
 
     battle_sfx = {
         'hit_unit': pygame.mixer.Sound("audio/TBC/021.ogg") if os.path.exists("audio/TBC/021.ogg") else None,
         'hit_tower': pygame.mixer.Sound("audio/TBC/022.ogg") if os.path.exists("audio/TBC/022.ogg") else None,
         'unit_die': pygame.mixer.Sound("audio/TBC/023.ogg") if os.path.exists("audio/TBC/023.ogg") else None
     }
-    for key, sfx in battle_sfx.items():
+    for sfx in battle_sfx.values():
         if sfx:
-            sfx.set_volume(0.6 if key in ['hit_unit', 'hit_tower'] else 0.7)
+            sfx.set_volume(0.7)
 
     while True:
         current_time = pygame.time.get_ticks()
@@ -267,7 +287,7 @@ async def main_game_loop(screen, clock):
                         pygame.mixer.music.stop()
                         current_bgm_path = None
                         if key_action_sfx.get('other_button'):
-                            key_action_sfx['other_button'].play()
+                            key_action_channel.play(key_action_sfx['other_button'])
 
             if elapsed_intro_time >= intro_duration + DELAY_TIME:
                 game_state = "main_menu"
@@ -275,6 +295,12 @@ async def main_game_loop(screen, clock):
                 current_bgm_path = None
 
         elif game_state == "main_menu":
+            main_menu_music = "audio/TBC/001.ogg"
+            if current_bgm_path != main_menu_music and os.path.exists(main_menu_music):
+                pygame.mixer.music.load(main_menu_music)
+                pygame.mixer.music.play(-1)
+                current_bgm_path = main_menu_music
+
             screen.blit(main_menu_bg, (0, 0))
 
             battle_rect = pygame.Rect(200, 300, 400, 150)
@@ -293,7 +319,6 @@ async def main_game_loop(screen, clock):
             resource_surf = select_font.render(resource_text, True, (255, 215, 0))
             screen.blit(resource_surf, (50, 30))
 
-            # 顯示錢包等級
             # wallet_info = select_font.render(f"錢包 Lv.{wallet_level} (戰鬥中可升級)", True, (200, 200, 255))
             # screen.blit(wallet_info, (50, 80))
 
@@ -307,11 +332,12 @@ async def main_game_loop(screen, clock):
                     if battle_rect.collidepoint(pos):
                         game_state = "level_map"
                         if key_action_sfx.get('other_button'):
-                            key_action_sfx['other_button'].play()
+                            key_action_channel.play(key_action_sfx['other_button'])
                     elif gacha_rect.collidepoint(pos):
                         '''
                         game_state = "gacha_developing"
                         if key_action_sfx.get('other_button'):
+                            key_action_channel.play(key_action_sfx['other_button'])
                             key_action_sfx['other_button'].play()
                         '''
                         game_state = "gacha"
@@ -319,6 +345,13 @@ async def main_game_loop(screen, clock):
                             key_action_sfx['other_button'].play()
 
         elif game_state == "level_map":
+            # 關卡選擇與貓咪選擇共用音樂
+            selection_music = "audio/TBC/002.ogg"
+            if current_bgm_path != selection_music and os.path.exists(selection_music):
+                pygame.mixer.music.load(selection_music)
+                pygame.mixer.music.play(-1)
+                current_bgm_path = selection_music
+
             from .ui.battle_menu import draw_battle_map_selection
             selected_idx, new_state = draw_battle_map_selection(
                 screen=screen,
@@ -332,6 +365,8 @@ async def main_game_loop(screen, clock):
             )
             if new_state == "main_menu":
                 game_state = "main_menu"
+                pygame.mixer.music.stop()
+                current_bgm_path = None
                 if key_action_sfx.get('other_button'):
                     key_action_sfx['other_button'].play()
             if selected_idx is not None:
@@ -343,6 +378,8 @@ async def main_game_loop(screen, clock):
                 print(f"選擇關卡 {selected_level + 1}: {levels[selected_level].name}")
 
         elif game_state == "cat_selection":
+            # 貓咪選擇繼續使用 selection_music（002.ogg）
+
             cat_rects, reset_rect, quit_rect, start_rect = draw_level_selection(
                 screen=screen,
                 levels=levels,
@@ -472,30 +509,32 @@ async def main_game_loop(screen, clock):
                             enemies = []
                             souls = []
                             shockwave_effects = []
-
-                            # 初始化冷卻時間為完成狀態
-                            current_time = pygame.time.get_ticks()
-                            last_spawn_time = {cat_type: current_time - cat_cooldowns.get(cat_type, 0) - 1 
-                                              for cat_type in cat_types}
-                            # 只保留 selected_cats 的冷卻時間
-                            last_spawn_time = {cat_type: last_spawn_time[cat_type] 
-                                              for cat_type in selected_cats if cat_type in last_spawn_time}
-
                             wallet_level = 1
-                            update_wallet_stats()
+                            stats = wallet_upgrade_table[wallet_level - 1]
+                            total_budget_limitation = stats["max_budget"]
+                            budget_rate = stats["budget_rate"]
+                            print(f"錢包等級設置為 Lv.{wallet_level}，最大預算 {total_budget_limitation}，預算增長率 {budget_rate}/s")
+                            # 初始化冷卻時間為完成狀態（可立即出擊）
+                            current_time_init = pygame.time.get_ticks()
+                            last_spawn_time = {}
+                            for cat_type in selected_cats:
+                                cooldown = cat_cooldowns.get(cat_type, 0)
+                                last_spawn_time[cat_type] = current_time_init - cooldown - 1  # 確保冷卻已過
+
                             current_budget = current_level.initial_budget
-                            last_budget_increase_time = current_time - 333
-                            level_start_time = current_time
+                            last_budget_increase_time = current_time_init - 333
+                            level_start_time = current_time_init
                             status = None
+
+                            # 停止選單音樂，戰鬥會自己播放關卡音樂
+                            pygame.mixer.music.stop()
+                            current_bgm_path = None
 
                             if current_level.music_path and os.path.exists(current_level.music_path):
                                 pygame.mixer.music.load(current_level.music_path)
                                 pygame.mixer.music.play(-1)
                                 current_bgm_path = current_level.music_path
                                 boss_music_active = False
-                            else:
-                                pygame.mixer.music.stop()
-                                current_bgm_path = None
                             boss_shockwave_played = False
 
                             if key_action_sfx.get('other_button'):
@@ -616,7 +655,7 @@ async def main_game_loop(screen, clock):
                             except Exception as e:
                                 print(f"Wallet upgrade save error: {e}")
 
-                            print(f"戰鬥中錢包升級成功！現在 Lv.{wallet_level}")
+                            print(f"現在 Lv.{wallet_level}, 最大預算 {total_budget_limitation}, 預算增長率 {budget_rate}")
                             if key_action_sfx.get('other_button'):
                                 key_action_sfx['other_button'].play()
                         else:
@@ -643,7 +682,7 @@ async def main_game_loop(screen, clock):
                                 cat_spawn_sfx['default'].play()
                             if key_action_sfx.get('can_deploy'):
                                 key_action_sfx['can_deploy'].play()
-                            print(f"Spawned {cat_type} at ({cat.x}, {cat.y})")
+                            # print(f"Spawned {cat_type} at ({cat.x}, {cat.y})")
                         else:
                             if key_action_sfx.get('cannot_deploy'):
                                 key_action_sfx['cannot_deploy'].play()
@@ -660,8 +699,13 @@ async def main_game_loop(screen, clock):
             camera_offset_x = max(0, min(camera_offset_x, bg_width - SCREEN_WIDTH))
 
             # 預算增加
+            stats = wallet_upgrade_table[wallet_level - 1]
+            total_budget_limitation = stats["max_budget"]
+            budget_rate = stats["budget_rate"]
+            # print(f"現在 Lv.{wallet_level + 1}, 最大預算 {total_budget_limitation}, 預算增長率 {budget_rate}")
             if current_time - last_budget_increase_time >= 333:
                 if current_budget < total_budget_limitation:
+                    
                     current_budget = min(current_budget + budget_rate, total_budget_limitation)
                 last_budget_increase_time = current_time
 
@@ -739,15 +783,18 @@ async def main_game_loop(screen, clock):
                 if status != "victory":
                     status = "victory"
                     game_state = "end"
-                    # ... 音效 ...
                     pygame.mixer.music.stop()
                     current_bgm_path = None
                     boss_music_active = False
                     boss_shockwave_played = False
+
+                    # 強制播放勝利音效
                     if victory_sfx:
                         victory_sfx.set_volume(0.8)
                         victory_sfx.play()
-
+                        print("勝利！播放音效 008.ogg")
+                    else:
+                        print("勝利音效未載入！檢查 audio/TBC/008.ogg")
                     clear_time_seconds = (current_time - level_start_time) / 1000
                     reward_data = LEVEL_REWARDS.get(selected_level, {})
                     print(f"關卡 {selected_level} 獲得獎勵資料: {reward_data}")
