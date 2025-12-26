@@ -27,7 +27,7 @@ LEVEL_REWARDS: Dict[int, Dict[str, Any]] = {
             {"weight": 10, "reward": {"gold": 400, "souls": 60}},
             {"weight": 60, "reward": {"gold": 600, "souls": 90}},
             {"weight": 70, "reward": {"unlock_cat": "speedy"}},
-            {"weight": 70, "reward": {"gold": 1000, "souls": 200, "unlock_cat": "speedy"}},
+            {"weight": 70, "reward": {"gold": 1000, "souls": 200}},
         ],
         "repeatable": [
             {"weight": 100, "reward": {"gold": 120, "souls": 15}},
