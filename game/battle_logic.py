@@ -3,7 +3,7 @@ import pygame
 
 # 在函式簽名中加入 battle_sfx 參數，並給予預設值 None，以防止舊的呼叫報錯。
 # 但請務必確保在 main_game_loop.py 中呼叫時傳入 battle_sfx。
-def update_battle(cats, enemies, our_tower, enemy_tower, now, souls, cat_y_manager, enemy_y_manager, shockwave_effects=None, current_budget=0, battle_sfx=None):
+def update_battle(cats, enemies, our_tower, enemy_tower, now, souls, cat_y_manager, enemy_y_manager, cannon, shockwave_effects=None, current_budget=0, battle_sfx=None):
     # 如果 shockwave_effects 列表為 None（表示首次呼叫），則初始化為空列表。
     if shockwave_effects is None:
         shockwave_effects = []
@@ -47,6 +47,9 @@ def update_battle(cats, enemies, our_tower, enemy_tower, now, souls, cat_y_manag
         enemy_tower.update_physic_effects()
         enemy_tower.update_electric_effects()
         enemy_tower.update_gas_effects()
+
+    current_time = pygame.time.get_ticks()
+    cannon.update(current_time, enemies, enemy_tower)
 
     # --- Boss 出場震波特效觸發 ---
     # 檢查新生成的 Boss，觸發出場震波特效。

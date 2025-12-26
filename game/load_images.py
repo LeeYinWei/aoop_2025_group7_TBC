@@ -88,3 +88,122 @@ def load_smoke_images():
         frames.append(image_copy)
 
     return frames
+
+import pygame
+import os
+
+def load_cannonskill_images(
+    origin_scale=0.1,
+    beam_scale=1.2,
+    sweep_fx_scale=0.3,
+    after_fx_scale1=0.3,
+    after_fx_scale2=0.3,
+    alpha=255
+):
+    def load_sequence(folder, prefix, frame_range, step=1, scale=1.0):
+        frames = []
+        for i in range(frame_range[0], frame_range[1], step):
+            path = os.path.join(folder, f"{prefix}{i}.png")
+            if not os.path.exists(path):
+                continue
+
+            img = pygame.image.load(path).convert_alpha()
+
+            if scale != 1.0:
+                new_size = (
+                    int(img.get_width() * scale),
+                    int(img.get_height() * scale)
+                )
+                img = pygame.transform.scale(img, new_size)
+
+            img_copy = img.copy()
+            img_copy.set_alpha(alpha)
+            frames.append(img_copy)
+
+        return frames
+
+    # ===============================
+    # 1️⃣ 砲口 Origin 動畫
+    # ===============================
+    origin_frames = load_sequence(
+        folder="images/cannon/origin",
+        prefix="origin",
+        frame_range=(1, 2),
+        step=1,
+        scale=origin_scale
+    )
+
+    # ===============================
+    # 2️⃣ 雷射光束（水平）
+    # ===============================
+    beam_frames = load_sequence(
+        folder="images/cannon/beam",
+        prefix="beam",
+        frame_range=(1, 2),
+        step=1,
+        scale=beam_scale
+    )
+
+    # ===============================
+    # 3️⃣ 掃射中地面 Splash
+    # ===============================
+    sweep_fx_frames = load_sequence(
+        folder="images/cannon/sweep_fx",
+        prefix="splash",
+        frame_range=(1, 3),
+        step=1,
+        scale=sweep_fx_scale
+    )
+
+    # ===============================
+    # 4️⃣ 掃射後沿地面移動特效
+    # ===============================
+    after_fx_frames_1 = load_sequence(
+        folder="images/cannon/after_fx/1",
+        prefix="Explosion_",
+        frame_range=(3, 6),
+        step=1,
+        scale=after_fx_scale1
+    )
+
+    # ✅ 第二組：請依你的實際路徑/檔名前綴修改
+    # 例如：images/skills/cannon/after_fx_v2/after_0.png ...
+    after_fx_frames_2 = load_sequence(
+        folder="images/cannon/after_fx/2",
+        prefix="Explosion_2_",
+        frame_range=(1, 7),
+        step=1,
+        scale=after_fx_scale2
+    )
+
+    # ✅ 變成二維（兩個列表）
+    after_fx_frames = [after_fx_frames_1, after_fx_frames_2]
+
+    return {
+        "origin": origin_frames,
+        "beam": beam_frames,
+        "sweep_fx": sweep_fx_frames,
+        "after_fx": after_fx_frames
+    }
+
+def load_cannonicon_image(scale=1.0):
+    ready = []
+    for i in range(1, 3, 1): 
+        img = pygame.image.load(f"images/cannonicon/ready/ready{i}.png").convert_alpha()
+        if scale != 1.0:
+            new_size = (int(img.get_width() * scale), int(img.get_height() * scale))
+            img = pygame.transform.scale(img, new_size)
+        image_copy = img.copy()
+        ready.append(image_copy)
+
+    full = pygame.image.load(f"images/cannonicon/full.png").convert_alpha()
+    if scale != 1.0:
+        new_size = (int(full.get_width() * scale), int(full.get_height() * scale))
+        full = pygame.transform.scale(full, new_size)
+    
+    gray = pygame.image.load(f"images/cannonicon/gray.png").convert_alpha()
+    if scale != 1.0:
+        new_size = (int(gray.get_width() * scale), int(gray.get_height() * scale))
+        gray = pygame.transform.scale(gray, new_size)
+    
+    return ready, full, gray

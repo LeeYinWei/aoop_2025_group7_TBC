@@ -705,6 +705,7 @@ async def main_game_loop(screen, clock):
                     except Exception as e:
                         print(f"Warning: failed to save player data: {e}")
 
+
         elif game_state == "paused":
             end_rect, continue_rect = draw_pause_menu(screen, font, current_level)
             pygame.display.flip()
