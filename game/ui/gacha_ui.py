@@ -152,7 +152,7 @@ def draw_gacha_screen(
         if is_win:
             # 顯示貓咪圖片
             cat_img = pygame.image.load(
-                f"./cat_folder/{gacha_result['won_id']}/cat_image.png"
+                f"./cat_folder/{gacha_result['won_id']}/cat_gacha.png"
             ).convert_alpha()
             
             cat_rect = cat_img.get_rect(
