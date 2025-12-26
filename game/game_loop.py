@@ -389,7 +389,7 @@ async def main_game_loop(screen, clock):
         elif game_state == "cat_selection":
             # 貓咪選擇繼續使用 selection_music（002.ogg）
 
-            cat_rects, reset_rect, quit_rect, start_rect = draw_level_selection(
+            cat_rects, reset_rect, quit_rect, start_rect, back_rect = draw_level_selection(
                 screen=screen,
                 levels=levels,
                 selected_level=selected_level,
@@ -423,7 +423,11 @@ async def main_game_loop(screen, clock):
                             button_rects = {cat_type: pygame.Rect(1100 + idx * 120, 50, 100, 50) for idx, cat_type in enumerate(selected_cats)}
                             if key_action_sfx.get('other_button'):
                                 key_action_sfx['other_button'].play()
-
+                    if back_rect.collidepoint(pos):
+                        game_state = "level_map"  # 或 "main_menu"，看你想回哪
+                        if key_action_sfx.get('other_button'):
+                            key_action_sfx['other_button'].play()
+                        continue  # 跳過後續處理
                     if reset_rect.collidepoint(pos):
                         completed_levels.clear()
                         player_resources = {"gold": 0, "souls": 0}
