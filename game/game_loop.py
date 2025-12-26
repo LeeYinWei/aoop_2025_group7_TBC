@@ -24,6 +24,9 @@ player_resources = {"gold": 0, "souls": 0}
 selected_cats = []
 selected_level = 0
 game_state = "intro"
+gacha_is_anim_playing = False
+gacha_result = None
+
 
 # first_clear 領取記錄
 claimed_first_clear = {"0": [[], []], "1": [[], []], "2": [[], []], "3": [[], []], "4": [[], []]}
@@ -141,7 +144,7 @@ async def main_game_loop(screen, clock):
 
     # Import entities and UI
     from .battle_logic import update_battle
-    from .ui import draw_game_ui, draw_pause_menu, draw_end_screen, draw_intro_screen, draw_ending_animation, draw_level_selection
+    from .ui import draw_game_ui, draw_pause_menu, draw_end_screen, draw_intro_screen, draw_ending_animation, draw_level_selection, GachaAnimationPlayer
     from .entities import cat_types, cat_costs, cat_cooldowns, levels, enemy_types, YManager, CSmokeEffect, load_cat_images, OriginalSpawnStrategy, AdvancedSpawnStrategy, MLSpawnStrategy, EnemySpawner, CannonSkill, CannonIcon
     from game.constants import csmoke_images1, csmoke_images2, cannon_images, icon_cfg, gacha_background
 
@@ -343,6 +346,7 @@ async def main_game_loop(screen, clock):
                         game_state = "gacha"
                         if key_action_sfx.get('other_button'):
                             key_action_sfx['other_button'].play()
+                        gacha_anim_player = GachaAnimationPlayer(
 
         elif game_state == "level_map":
             # 關卡選擇與貓咪選擇共用音樂
@@ -556,12 +560,15 @@ async def main_game_loop(screen, clock):
                 print("返回主選單 from 轉蛋頁面")
         elif game_state == "gacha":
             from .ui.gacha_ui import draw_gacha_screen # 確保路徑對
-            new_state = draw_gacha_screen(
-                screen=screen,
-                select_font=select_font,
-                font=font,
-                gacha_bg=gacha_background, # 這是你 load_single_image 載入的圖
-                key_action_sfx=key_action_sfx
+            new_state, gacha_is_anim_playing, gacha_result = draw_gacha_screen(
+                screen,
+                select_font,
+                font,
+                gacha_background,
+                gacha_anim_player,
+                gacha_is_anim_playing,
+                gacha_result,
+                key_action_sfx
             )
             if new_state == "main_menu":
                 game_state = "main_menu"
