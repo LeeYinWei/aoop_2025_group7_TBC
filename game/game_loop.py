@@ -942,6 +942,7 @@ async def main_game_loop(screen, clock):
                             setattr(pygame.time, "victory_display_time", 0)
                             if key_action_sfx.get('other_button'):
                                 key_action_sfx['other_button'].play()
+                            
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     pos = event.pos
                     if continue_rect and continue_rect.collidepoint(pos):
