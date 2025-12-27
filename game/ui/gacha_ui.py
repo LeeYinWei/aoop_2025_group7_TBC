@@ -185,7 +185,7 @@ def draw_gacha_screen(
             fail_img = pygame.transform.scale(fail_img, new_size)
             
             fail_rect = fail_img.get_rect(
-                center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 )
+                center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 -10)
             )
             screen.blit(fail_img, fail_rect)
             # 大字 msg
@@ -193,16 +193,24 @@ def draw_gacha_screen(
             screen.blit(
                 text,
                 text.get_rect(
-                    center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 160)
+                    center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 150)
                 )
             )
         hint = font.render("Press ENTER to continue", True, (216, 246, 144))
-        screen.blit(
-            hint,
-            hint.get_rect(
-                center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 70)
+        if is_win:
+            screen.blit(
+                hint,
+                hint.get_rect(
+                    center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 80)
+                )
             )
-        )
+        else:
+            screen.blit(
+                hint,
+                hint.get_rect(
+                    center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 75)
+                )
+            )
     '''
     # -------------------------
     # 顯示結果
@@ -250,6 +258,4 @@ def draw_gacha_screen(
                 gacha_show_result = False
                 gacha_result = None
 
-
-    # 🔴 重點：把狀態「傳回去」
     return new_game_state, gacha_is_anim_playing, gacha_result, gacha_is_fading, gacha_show_result, gacha_fade_alpha
