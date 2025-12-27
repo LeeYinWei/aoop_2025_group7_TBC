@@ -25,6 +25,8 @@ selected_cats = []
 selected_level = 0
 game_state = "intro"
 
+
+
 # first_clear 領取記錄
 claimed_first_clear = {"0": [[], []], "1": [[], []], "2": [[], []], "3": [[], []], "4": [[], []]}
 
@@ -94,6 +96,12 @@ async def main_game_loop(screen, clock):
     global selected_cats, selected_level, game_state, intro_start_time
     global current_bgm_path, boss_music_active, boss_shockwave_played
     global wallet_level, total_budget_limitation, budget_rate
+    gacha_is_anim_playing = False
+    gacha_is_fading = False          # 白畫面淡出中
+    gacha_show_result = False        # 顯示結果中
+    gacha_fade_alpha = 255           # 白畫面透明度
+    gacha_result = None
+
 
     FPS = 60
     font = pygame.font.SysFont(None, 25)
@@ -143,7 +151,7 @@ async def main_game_loop(screen, clock):
     from .battle_logic import update_battle
     from .ui import draw_game_ui, draw_pause_menu, draw_end_screen, draw_intro_screen, draw_ending_animation, draw_level_selection
     from .entities import cat_types, cat_costs, cat_cooldowns, levels, enemy_types, YManager, CSmokeEffect, load_cat_images, OriginalSpawnStrategy, AdvancedSpawnStrategy, MLSpawnStrategy, EnemySpawner, CannonSkill, CannonIcon
-    from game.constants import csmoke_images1, csmoke_images2, cannon_images, icon_cfg
+    from game.constants import csmoke_images1, csmoke_images2, cannon_images, icon_cfg, gacha_background, gacha_anim_player
 
     # Battle variables
     cats = []
@@ -334,9 +342,16 @@ async def main_game_loop(screen, clock):
                         if key_action_sfx.get('other_button'):
                             key_action_channel.play(key_action_sfx['other_button'])
                     elif gacha_rect.collidepoint(pos):
+                        '''
                         game_state = "gacha_developing"
                         if key_action_sfx.get('other_button'):
                             key_action_channel.play(key_action_sfx['other_button'])
+                            key_action_sfx['other_button'].play()
+                        '''
+                        game_state = "gacha"
+                        if key_action_sfx.get('other_button'):
+                            key_action_sfx['other_button'].play()
+
 
         elif game_state == "level_map":
             # 關卡選擇與貓咪選擇共用音樂
@@ -567,7 +582,30 @@ async def main_game_loop(screen, clock):
             if new_state == "main_menu":
                 game_state = "main_menu"
                 print("返回主選單 from 轉蛋頁面")
-
+        elif game_state == "gacha":
+            from .ui.gacha_ui import draw_gacha_screen # 確保路徑對
+            new_state, gacha_is_anim_playing, gacha_result, gacha_is_fading, gacha_show_result, gacha_fade_alpha = draw_gacha_screen(
+                screen,
+                select_font,
+                font,
+                gacha_background,
+                gacha_anim_player,
+                gacha_is_anim_playing,
+                gacha_result,
+                gacha_is_fading, 
+                gacha_show_result, 
+                gacha_fade_alpha,
+                key_action_sfx
+            )
+            if new_state == "main_menu":
+                game_state = "main_menu"
+                gacha_is_anim_playing = False
+                gacha_is_fading = False          # 白畫面淡出中
+                gacha_show_result = False        # 顯示結果中
+                gacha_fade_alpha = 255           # 白畫面透明度
+                gacha_result = None
+            elif new_state == "quit":
+                return
         elif game_state == "playing":
             current_level = levels[selected_level]
             bg_width = current_level.background.get_width()
