@@ -142,11 +142,11 @@ async def main_game_loop(screen, clock):
 
     # Level nodes
     LEVEL_NODES = [
-        (300, 400),
-        (600, 250),
-        (900, 450),
-        (1100, 300),
-        (700, 600),
+        (120, 300),
+        (330, 120),
+        (640, 120),
+        (640, 480),
+        (330, 480),
     ]
 
     # Import entities and UI
