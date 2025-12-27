@@ -100,10 +100,11 @@ class RechargeModal:
             txt = self.font2.render(f"{pack['gold']} Gold {pack['souls']} Souls ({pack['price']})", True, (255, 255, 255))
             screen.blit(txt, txt.get_rect(center=pack["rect"].center))
         # 信用卡輸入框
-        input_rect = pygame.Rect(self.rect.x + 600, self.rect.y + 220, 300, 50)
+        input_rect = pygame.Rect(self.rect.x + 600, self.rect.y + 220, 230, 50)
         pygame.draw.rect(screen, (255, 255, 255), input_rect, 2, border_radius=6)
         card_text = self.format_card_number()
-        render = self.font2.render(card_text, True, (255, 255, 255))
+        masked_text = "".join("*" if ch != " " else " " for ch in card_text)
+        render = self.font2.render(masked_text, True, (255, 255, 255))
         screen.blit(render, (input_rect.x + 10, input_rect.y + 10))
         
         # draw visa icon (與 input_rect 同高度、在左側一點)
