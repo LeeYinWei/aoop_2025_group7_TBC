@@ -27,7 +27,7 @@ cat_config = {
     "kb_frames": [],
     "delta_y": -42, # 微調 y 座標
     "ibtn_idle": "cat_folder/kp/ibtn_idle.png",
-    "ibtn_hover": "ccat_folder/kp/ibtn_hover.png",
+    "ibtn_hover": "cat_folder/kp/ibtn_hover.png",
     "ibtn_pressed": "cat_folder/kp/ibtn_pressed.png",
     "attack_type": "physic",  # 攻擊類型
     "attack_type": "physic",  # 攻擊類型
