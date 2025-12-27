@@ -638,7 +638,7 @@ async def main_game_loop(screen, clock):
         elif game_state == "playing":
             current_level = levels[selected_level]
             bg_width = current_level.background.get_width()
-
+            current_budget = min(current_budget, total_budget_limitation)
             # 繪製遊戲 UI
             pause_rect, button_rects, camera_offset_x, upgrade_rect = draw_game_ui(
                 screen, current_level, current_budget, enemy_tower, current_time, level_start_time,
@@ -808,7 +808,7 @@ async def main_game_loop(screen, clock):
                 cat_y_manager, enemy_y_manager, cannon, shockwave_effects, current_budget, battle_sfx
             )
             souls = [soul for soul in souls if soul.update()]
-
+            
             # 繪製所有物件
             our_tower.draw(screen, camera_offset_x)
             if enemy_tower:
