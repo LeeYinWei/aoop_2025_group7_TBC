@@ -99,7 +99,8 @@ recharge_modal = RechargeModal(
     resource_file=RESOURCE_FILE,
     font1 = pygame.font.SysFont(None, 60),
     font2 = pygame.font.SysFont(None, 40),
-    font3 = pygame.font.SysFont(None, 50)
+    font3 = pygame.font.SysFont(None, 50),
+    success_rect=pygame.Rect(340, 200, 650, 250)
 )
 recharge_bg = load_single_image(
     path="images/background/recharge_bg.jpg", 

@@ -3,8 +3,10 @@ import json
 import time
 
 class RechargeModal:
-    def __init__(self, panel_rect, resource_file, font1, font2, font3):
+    def __init__(self, panel_rect, resource_file, font1, font2, font3, success_rect):
+        
         self.rect = panel_rect
+        self.success_rect = success_rect
         self.resource_file = resource_file
         self.font1 = font1#bigger
         self.font2 = font2
@@ -31,9 +33,9 @@ class RechargeModal:
         self.cancel_rect = pygame.Rect(0,0,0,0)   # 取消按鈕（draw 會更新位置）
 
         # ----------------- 儲值成功動畫 -----------------
-        self.success = False
+        self.success = False #在儲值成功通知界面
         self.fade_alpha = 0
-        self.fading = False
+        #self.fading = False
 
 
     # ---------- 更新 ----------
@@ -42,14 +44,14 @@ class RechargeModal:
         if time.time() - self.last_cursor_toggle > 0.5:
             self.cursor_visible = not self.cursor_visible
             self.last_cursor_toggle = time.time()
-
+        '''
         # 成功動畫 fade out
         if self.fading:
-            self.fade_alpha -= 8
+            self.fade_alpha -= 2
             if self.fade_alpha <= 0:
                 self.fade_alpha = 0
                 self.fading = False
-
+        '''
     # ---------- 繪製 ----------
     def draw(self, screen):
         # 畫半透明 panel
@@ -67,17 +69,17 @@ class RechargeModal:
 
         #pack_title
         pack_title = self.font3.render("Recharge Packs:", True, (255, 255, 255))
-        screen.blit(pack_title, (self.rect.x + 20, self.rect.y + 120))
+        screen.blit(pack_title, (self.rect.x + 20, self.rect.y + 140))
 
         #card_title
         card_title = self.font3.render("Card Number:", True, (255, 255, 255))
-        screen.blit(card_title, (self.rect.x + 450, self.rect.y + 120))
+        screen.blit(card_title, (self.rect.x + 450, self.rect.y + 140))
 
         # 繪製儲值方案
         for i, pack in enumerate(self.packs):
             # 計算按鈕位置
             btn_x = self.rect.x + 50
-            btn_y = self.rect.y + 180 + i * 60
+            btn_y = self.rect.y + 200 + i * 60
             btn_w = 300
             btn_h = 45
             pack["rect"] = pygame.Rect(btn_x, btn_y, btn_w, btn_h)
@@ -95,7 +97,7 @@ class RechargeModal:
             txt = self.font2.render(f"{pack['gold']} Gold ({pack['price']})", True, (255, 255, 255))
             screen.blit(txt, txt.get_rect(center=pack["rect"].center))
         # 信用卡輸入框
-        input_rect = pygame.Rect(self.rect.x + 450, self.rect.y + 200, 260, 50)
+        input_rect = pygame.Rect(self.rect.x + 450, self.rect.y + 220, 260, 50)
         pygame.draw.rect(screen, (255, 255, 255), input_rect, 2, border_radius=6)
         card_text = self.format_card_number()
         render = self.font2.render(card_text, True, (255, 255, 255))
@@ -107,7 +109,7 @@ class RechargeModal:
             pygame.draw.line(screen, (255, 255, 255), (cursor_x, input_rect.y + 10), (cursor_x, input_rect.y + 40), 2)
 
         # 確認按鈕（灰/亮）
-        self.confirm_rect = pygame.Rect(self.rect.x + 450, self.rect.y + 280, 120, 40)
+        self.confirm_rect = pygame.Rect(self.rect.x + 450, self.rect.y + 300, 120, 40)
         if self.selected_pack and len(self.card_digits) == 16:
             confirm_color = (50, 200, 50)  # 可點亮
         else:
@@ -123,17 +125,39 @@ class RechargeModal:
         cancel_text = self.font2.render("Cancel", True, (255, 255, 255))
         screen.blit(cancel_text, cancel_text.get_rect(center=self.cancel_rect.center))
 
-        # 成功儲值畫面
-        if self.fade_alpha > 0:
-            fade = pygame.Surface(screen.get_size())
-            fade.fill((255, 255, 255))
-            fade.set_alpha(self.fade_alpha)
-            screen.blit(fade, (0, 0))
-            msg = self.font1.render(f"Recharge Success! +{self.selected_pack['gold']} Gold", True, (0, 0, 0))
-            screen.blit(msg, msg.get_rect(center=screen.get_rect().center))
-            enter_msg = self.font1.render("Press Enter to close", True, (0, 0, 0))
-            screen.blit(enter_msg, enter_msg.get_rect(center=(screen.get_rect().centerx, screen.get_rect().centery+50)))
+        if self.success:
+            # 1. 繪製半透明黑色背景遮罩 (讓後方遊戲畫面變暗，突出視窗)
+            overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 150))
+            screen.blit(overlay, (0, 0))
 
+            # 2. 繪製主視窗底色 (深灰色帶圓角)
+            # 稍微擴展一下 rect 讓它看起來大方一點
+            panel_rect = self.success_rect.inflate(20, 20)
+            pygame.draw.rect(screen, (40, 44, 52), panel_rect, border_radius=15) # 主背景
+            pygame.draw.rect(screen, (255, 215, 0), panel_rect, 3, border_radius=15) # 金色外框
+
+            # 3. 繪製頂部標題裝飾 (可選)
+            title_area = pygame.Rect(panel_rect.x, panel_rect.y, panel_rect.width, 40)
+            pygame.draw.rect(screen, (60, 70, 90), title_area, border_top_left_radius=15, border_top_right_radius=15)
+
+            # 4. 渲染文字 - 標題
+            title_msg = self.font1.render("CONGRATULATIONS", True, (255, 215, 0))
+            screen.blit(title_msg, title_msg.get_rect(center=(panel_rect.centerx, panel_rect.y + 20)))
+
+            # 5. 渲染文字 - 獲得內容 (亮白色)
+            msg_text = f"Recharge Success! +{self.selected_pack['gold']} Gold"
+            msg = self.font1.render(msg_text, True, (255, 255, 255))
+            screen.blit(msg, msg.get_rect(center=(panel_rect.centerx, panel_rect.centery + 10)))
+
+            # 6. 渲染提示文字 (灰色，並加上一個小背景像按鈕一樣)
+            enter_msg = self.font3.render("Press Enter to close", True, (180, 180, 180))
+            enter_rect = enter_msg.get_rect(center=(panel_rect.centerx, panel_rect.bottom - 35))
+            
+            # 在提示字下面畫一個淡淡的底色
+            #pygame.draw.rect(screen, (60, 60, 60), enter_rect.inflate(20, 10), border_radius=5)
+            screen.blit(enter_msg, enter_rect)
+            
 
     # ---------- 事件 ----------
     def handle_event(self, event):
@@ -165,13 +189,11 @@ class RechargeModal:
             # 儲值成功後 Enter 離開
             if self.success:
                 if event.key == pygame.K_RETURN:
-                    return "close"
+                    self.success = False
 
             # 輸入中
             else:
-                if event.key == pygame.K_ESCAPE:
-                    return "close"
-                elif event.key == pygame.K_BACKSPACE:
+                if event.key == pygame.K_BACKSPACE:
                     self.card_digits = self.card_digits[:-1]
                 elif event.unicode.isdigit() and len(self.card_digits) < 16:
                     self.card_digits += event.unicode
@@ -184,7 +206,7 @@ class RechargeModal:
         self.selected_pack = None
         self.success = False
         self.fade_alpha = 0
-        self.fading = False
+        #self.fading = False
     # ---------- 工具 ----------
     def format_card_number(self):
         s = self.card_digits
@@ -201,5 +223,5 @@ class RechargeModal:
             json.dump(data, f, indent=4)
 
         self.fade_alpha = 255
-        self.fading = True
+        #self.fading = True
         self.success = True
