@@ -188,8 +188,8 @@ def draw_game_ui(screen, current_level, current_budget, enemy_tower, current_tim
         else:
             # fallback 文字
             title_surf = budget_font.render(f"Lv.{wallet_level}", True, (255, 215, 0))
-            cost_surf = font.render(f"升級 {next_cost} 金幣", True, (255, 255, 255) if can_upgrade else (255, 100, 100))
-            next_surf = font.render(f"→ Lv.{wallet_level + 1}", True, (0, 255, 255))
+            cost_surf = font.render(f"{next_cost} budget", True, (255, 255, 255) if can_upgrade else (255, 100, 100))
+            next_surf = font.render(f"to Lv.{wallet_level + 1}", True, (0, 255, 255))
             screen.blit(title_surf, title_surf.get_rect(centerx=wallet_rect.centerx, y=wallet_y + 20))
             screen.blit(cost_surf, cost_surf.get_rect(centerx=wallet_rect.centerx, y=wallet_y + 60))
             screen.blit(next_surf, next_surf.get_rect(centerx=wallet_rect.centerx, y=wallet_y + 90))
@@ -208,7 +208,7 @@ def draw_game_ui(screen, current_level, current_budget, enemy_tower, current_tim
             screen.blit(max_surf, max_surf.get_rect(center=wallet_rect.center))
 
     # === 暫停按鈕（右上角）===
-    pause_rect = pygame.Rect(SCREEN_WIDTH - 100, 40, 80, 80)
+    pause_rect = pygame.Rect(SCREEN_WIDTH - 120, 50, 100, 70)
 
     try:
         pause_icon = pygame.image.load("images/ui/pause_icon.png").convert_alpha()
