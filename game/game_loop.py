@@ -439,7 +439,8 @@ async def main_game_loop(screen, clock):
                                 selected_cats.remove(cat_type)
                             elif cat_type not in selected_cats and len(selected_cats) < 10:
                                 selected_cats.append(cat_type)
-                            cat_key_map = {pygame.K_1 + i: cat_type for i, cat_type in enumerate(selected_cats[:10])}
+                            cat_key_map = {pygame.K_1 + i: cat_type for i, cat_type in enumerate(selected_cats[:9])}
+                            cat_key_map[pygame.K_0] = selected_cats[9] if len(selected_cats) >= 10 else None
                             button_rects = {cat_type: pygame.Rect(1100 + idx * 120, 50, 100, 50) for idx, cat_type in enumerate(selected_cats)}
                             if key_action_sfx.get('other_button'):
                                 key_action_sfx['other_button'].play()
