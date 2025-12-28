@@ -6,9 +6,9 @@ aoop-2025-proj repo
 ## 專案結構
 aoop_2025_group7_TBC/
 
-├── main.py              # 應用程式入口點，初始化並啟動遊戲（呼叫 game/game_loop.py 主要迴圈）
+├── main.py              # 舊版程式入口
 
-├── main_v2.py           # 備用/測試入口（如有使用）
+├── main_v2.py           # 應用程式入口點，初始化並啟動遊戲（呼叫 game/game_loop.py 主要迴圈）
 
 ├── README.md            # 專案說明文件
 
@@ -18,7 +18,7 @@ aoop_2025_group7_TBC/
 
 │   ├── __init__.py      # 標記為 Python 套件
 
-│   ├── game_loop.py     # ✅ 主要遊戲迴圈（State Machine）：intro/main_menu/level_map/cat_selection/gacha/recharge/playing/paused/end/ending
+│   ├── game_loop.py     # （State Machine, 10 states）
 
 │   ├── game_loop_old.py # 舊版遊戲迴圈備份
 
@@ -40,7 +40,7 @@ aoop_2025_group7_TBC/
 
 │   ├── rechargemodal.py # 儲值/購買彈窗（信用卡輸入、成功提示等）
 
-│   ├── uix.py           # UI 輔助/共用元件（若有使用）
+│   ├── uix.py           # 舊UI函數存放區
 
 │   ├── game_charactor.py # 角色相關整合/舊檔（命名與實際用途以內容為準）
 
@@ -135,8 +135,6 @@ aoop_2025_group7_TBC/
 ├── level_folder/        # 關卡設定資料
 
 ├── intro/               # README 示意圖、開場相關素材（非必然由程式讀取）
-
-├── gacha_rotate/        # 轉蛋影片拆幀輸出（若未搬到 images/ 仍可保留）
 
 ├── video2img/           # 影片轉圖片工具（OpenCV 拆幀）
 
