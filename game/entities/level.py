@@ -30,14 +30,21 @@ class Level:
         # Initialize spawned_counts for proper resetting
         self.spawned_counts = {(et["type"], et.get("variant", "default")): 0 for et in self.enemy_types}
         self.all_limited_spawned = False
+        # ...existing code...
         self.background = None
         try:
             self.background = pygame.image.load(background_path)
-            self.background = pygame.transform.scale(self.background, (2560, 600))#, (1280, 600)
+
+            # 若檔名以 "_x2" 結尾（不含副檔名），背景用 2 倍寬；否則用一般寬度
+            base = os.path.splitext(os.path.basename(background_path))[0]
+            target_size = (2560, 600) if base.endswith("_x2") else (1280, 600)
+
+            self.background = pygame.transform.scale(self.background, target_size)
         except pygame.error as e:
             print(f"Cannot load background image '{background_path}': {e}")
             pygame.quit()
             sys.exit()
+# ...existing code...
         self.last_spawn_times = {(et["type"], et.get("variant", "default")): -et.get("initial_delay", 0) for et in self.enemy_types}
         self.our_tower_config = our_tower_config
         self.enemy_tower_config = enemy_tower_config

@@ -44,7 +44,7 @@ level_config = {
     "spawn_interval": 3000,
     "survival_time": 60, # Survival time in seconds. Assuming this is milliseconds in your game logic?
                         # If it's 60 seconds, ensure your game loop converts it to milliseconds for comparisons.
-    "background_path": "images/background/background3_x2.png", # Corrected path if "background/" means base game folder
+    "background_path": "images/background/background3.png", # Corrected path if "background/" means base game folder
     "our_tower": {
         "y": 140,
         "width": 350,
@@ -60,10 +60,10 @@ level_config = {
         "hp": 600,
         "tower_path": "images/tower/enemy_tower.png" # Corrected path
     },
-    "tower_distance": 2200,
+    "tower_distance": 900,#1100
     "initial_budget": 1000, # <--- ADD THIS LINE with a starting budget for this level
     "music_path": "audio/TBC/117.ogg", # <--- ADD THIS LINE with the path to the level's background music
     "switch_music_on_boss": True, # <--- ADD THIS LINE (set to True if you want music to change when a boss appears)
     "boss_music_path": "audio/TBC/118.ogg", # <--- ADD THIS LINE (path to boss music, only relevant if switch_music_on_boss is True)
-    "spawn_strategy": "advanced" # <--- ADD THIS LINE to specify the spawn strategy class, (original, advanced, ml)
+    "spawn_strategy": "original" # <--- ADD THIS LINE to specify the spawn strategy class, (original, advanced, ml)
 }

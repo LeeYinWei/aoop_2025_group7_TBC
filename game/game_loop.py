@@ -542,9 +542,9 @@ async def main_game_loop(screen, clock):
                             cannon = CannonSkill(
                                 origin_pos=(our_tower_center - our_tower.width // 4 - 10, 205),
                                 sweep_start_x=our_tower_center - our_tower.width // 2,
-                                range=2600,
+                                range=500,
                                 ground_y=460,
-                                sweep_speed=2.5,
+                                sweep_speed=2.0,
                                 cooldown=5000,
                                 damage=300,
                                 origin_frames=cannon_images["origin"],
