@@ -113,8 +113,11 @@ async def main_game_loop(screen, clock):
     SCREEN_HEIGHT = screen.get_height()
 
     # Load backgrounds
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    print(f"Base dir: {base_dir}")
     try:
-        main_menu_bg = pygame.image.load("./images/map_main_menu.png").convert_alpha()
+        main_menu_path = os.path.join(base_dir, "images", "map_background.png")
+        main_menu_bg = pygame.image.load(main_menu_path).convert_alpha()
         main_menu_bg = pygame.transform.scale(main_menu_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
     except Exception as e:
         print(f"Warning: failed to load main_menu_bg: {e}")
@@ -122,7 +125,8 @@ async def main_game_loop(screen, clock):
         main_menu_bg.fill((20, 40, 60))
 
     try:
-        level_map_bg = pygame.image.load("./images/map_level_select.png").convert_alpha()
+        level_map_path = os.path.join(base_dir, "images", "map_level_select.jpeg")
+        level_map_bg = pygame.image.load(level_map_path).convert_alpha()
         level_map_bg = pygame.transform.scale(level_map_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
     except Exception as e:
         print(f"Warning: failed to load level_map_bg: {e}")
@@ -131,7 +135,8 @@ async def main_game_loop(screen, clock):
 
     # Snail player
     try:
-        snail_image = pygame.image.load("./images/character/snail.png").convert_alpha()
+        snail_image_path = os.path.join(base_dir, "images", "character", "snail.png")
+        snail_image = pygame.image.load(snail_image_path).convert_alpha()
         snail_image = pygame.transform.scale(snail_image, (70, 70))
     except Exception as e:
         print(f"Warning: failed to load snail_image: {e}")
@@ -141,11 +146,11 @@ async def main_game_loop(screen, clock):
 
     # Level nodes
     LEVEL_NODES = [
-        (300, 400),
-        (600, 250),
-        (900, 450),
-        (1100, 300),
-        (700, 600),
+        (150, 400),
+        (500, 250),
+        (700, 450),
+        (900, 300),
+        (1100, 250),
     ]
 
     # Import entities and UI
