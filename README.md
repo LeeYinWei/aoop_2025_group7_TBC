@@ -181,20 +181,28 @@ aoop_2025_group7_TBC/
 ![win](intro/victory.png "勝利畫面")
 ![loss](intro/loss.png "失敗畫面")
 - **轉蛋系統**
-點擊右下角"Roll Single進行一次轉蛋"。必須消耗一定Gold和Souls（按鈕上有寫）。
+點擊右下角"Roll Single進行一次轉蛋"。必須消耗一定Gold和Souls（按鈕上有寫），若不足則自動導引至儲值界面。
 ![gacha](intro/gacha.png "轉蛋頁面")
-中獎結果
-![win_gacha](intro/loss.png "中獎畫面")
+中獎（重複）結果
+![win_gacha_dup](intro/win_gacha_dup.png "中獎（重複）畫面")
+中獎（新）結果
+![win_gacha_new](intro/win_gacha_new.png "中獎（新）畫面")
+共歸結果
+![loss_gacha](intro/loss_gacha.png "共歸畫面")
+- **儲值系統**
+滑鼠點擊選擇左側方案輸入信用卡card number儲值。
+![recharge](intro/recharge.png "儲值頁面")
+
 ## 需求與安裝
 ### 必要依賴
 - Python 3.8 或更高版本
 - Pygame 2.0 或更高版本
 
 ### 安裝步驟
-1. 克隆專案到本地：
+1. clone專案到本地：
    ```bash
-   git clone https://github.com/yourusername/oop-2025-proj-TBC.git
-   cd oop-2025-proj-TBC
+   git clone git@github.com:unknown899/aoop_2025_group7_TBC.git
+   cd aoop_2025_group7_TBC
 2. 設定虛擬環境（如果有意保持整潔）
     ```bash
     python -m venv venv
@@ -203,8 +211,8 @@ aoop_2025_group7_TBC/
 3. 安裝pygame
     ```bash
     pip install pygame
-4. 執行main.py
+4. 執行main_v2.py(注意：不是main.py)
     ```bash
-    python3 main.py
+    python3 main_v2.py
 ## class diagram
 ![classDiagram](https://www.plantuml.com/plantuml/png/hLRDRXit4BxhAVQe8BOVG8SWW14K1T8UclPG10OnMeuaGbnoGGubgqNVlVpPdQKeHqY0NEJbDvp_RuR-w0aSXK6lUWtUTyz0tR-hhdjytNGxRO7IzwNwfik8cywJImS_8ifAU5QI3fjEcNmweDeVY8_A2o22_gZCVjDjhTK91QC6uGc8hJBaI90QSB47NZWaXq0e5miJ9AIAEgP7ZgSMEUn9MSEslBOab97uEaFlYyT9PTrOUvTkX542uThOSr8gc7HmNllU8PfytYE9v6nTQUJyWXUusqM9N_V1EJHLTgnP2YJ-iGQBWS6UqjT_gwa_dmmEb_iTKbvihVTSe5mtFyBP27-m_V4C9wo4OwNQzXFe-BtTRGhweydVB-ETqgGlWYCA2GFiSLt-r5qx6Xlrjb6vBkIVzeok5F9I8hwROLkf0Lx55T1RGz2J66sy7eklbQVxYTsFV8dqozoqJxc2zvkVud8WLV0LA8E3Q_QtmtNBxOufycOAa6D1AS0XhDFjyRA70P_-Y70LkmtwNi3izvl-sDJVlu61_TopBNWKI-C6PSg9Yv3uw1cnVHz6XRB0fJkSoWcKXgsEzd8O54QDNwFYGz9-ITSSQimErmtDg_W-umcdN0qCopR3DB4YhSt9xrUf-cpsiGnbD8Fk17hfJd0d5O7hxPS8l7Ss62b6e0FRjy49IcJU54ulFbiqdtbDik4S1KhHsv2Pcy9Bk0PF8Wjp89K4j1PQ3OfGbWkyZjbtRyrExLadbT0ZbP1yuNv_m3YNRzXYCYp5_GK6_6pjMEfRkC6K-nBS3dfCabx7MM512llfEK59bg3cfV6e2ujrQXvNXE4UQ6vQr7WfSpwC6badYZrcfUhkCz3BN0h5RS-hk_JT1ZsZQK8AE8zvsPHih1d_bn_gUTl4fhlR8FUO-DoxnEzhmf4bqDELqgBh9L8M-Mo4uKd10IscoXF0PS-LQrxukORY8eOow1iUUKxlRM7HEs8IZak6sq1aJLgsDQkZ9sTRtulWPbNkGA9GvbPm4NQtyqWtzSWQeCS3y78T85h8_DFMZfdVlrk32x__-ZKp-xssC15B5196ZwAQV9LVYi9_iRnM3zq4LKzMSj8EIDcjhOF9taDN6FtGNOz5TUw1edXdayTs47XrifkSS51iVYhGRFMQFmzTHM0MvXOzT2rXRaAgQ5xaTVCvueKbpOF58OyGF8e1JU2ea-vjRcYaA3U-bLxXV4fBYkA__Fg3FOj1UPzQEnUnxBjtJ852nf_T-6AsZRk4DTCvdfc_RrJfx60KXA-qJZzvecSB0xoMo3WANfnrsPJP2p1gIDFqNK6aAU7zRnyVFtJFG0sITsk3vHtOOCqoRQKsw0RYBNC5byT-mPwUFdJJVxjR8D8OamyU_IhETPBD5oFiq4XqVfKjL856KIA3zIhLPJNxvOIZlAm-NyauzKgw-XWzX47_3m00 "class diagram")
