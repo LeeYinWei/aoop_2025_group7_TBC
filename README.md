@@ -203,7 +203,7 @@ aoop_2025_group7_TBC/
    ```bash
    git clone git@github.com:unknown899/aoop_2025_group7_TBC.git
    cd aoop_2025_group7_TBC
-2. 設定虛擬環境（如果有意保持整潔）
+2. 設定虛擬環境（如果有意保持整潔，可省略）
     ```bash
     python -m venv venv
     source venv/bin/activate  # Linux/Mac
