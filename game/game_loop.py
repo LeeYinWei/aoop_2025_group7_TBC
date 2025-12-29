@@ -467,26 +467,46 @@ async def main_game_loop(screen, clock):
                             key_action_sfx['other_button'].play()
                         continue  # 跳過後續處理
                     if reset_rect.collidepoint(pos):
-                        completed_levels.clear()
+                        # 重設記憶體中的數值
                         player_resources = {"gold": 0, "souls": 0}
+                        wallet_level = 1
                         unlocked_cats = {"basic", "eraser"}
                         selected_cats = []
-                        wallet_level = 1
-                        update_wallet_stats()
-                        claimed_first_clear = {"0": [[], []], "1": [[], []], "2": [[], []], "3": [[], []], "4": [[], []]}
+                        completed_levels.clear()
 
-                        for path in [save_file, PLAYER_RESOURCES_FILE, PLAYER_UNLOCKED_CATS_FILE, FIRST_CLEAR_CLAIMED_FILE, WALLET_LEVEL_FILE]:
+                        claimed_first_clear = {
+                            "0": [[], []], "1": [[], []], "2": [[], []],
+                            "3": [[], []], "4": [[], []]
+                        }
+
+                        update_wallet_stats()
+
+                        # 刪除「非資源」存檔
+                        for path in [
+                            save_file,
+                            PLAYER_UNLOCKED_CATS_FILE,
+                            FIRST_CLEAR_CLAIMED_FILE,
+                            WALLET_LEVEL_FILE
+                        ]:
                             if os.path.exists(path):
                                 os.remove(path)
 
+                        # 重建必要檔案
                         with open(save_file, "w") as f:
                             json.dump([], f)
+
+                        with open(PLAYER_RESOURCES_FILE, "w", encoding="utf-8") as f:
+                            json.dump(player_resources, f, indent=4)
+
                         with open(PLAYER_UNLOCKED_CATS_FILE, "w") as f:
                             json.dump(list(unlocked_cats), f, indent=4)
+
                         with open(FIRST_CLEAR_CLAIMED_FILE, "w") as f:
                             json.dump(claimed_first_clear, f, indent=4)
+
                         with open(WALLET_LEVEL_FILE, "w") as f:
                             json.dump(wallet_level, f)
+
 
                         game_state = "intro"
                         intro_start_time = pygame.time.get_ticks()
